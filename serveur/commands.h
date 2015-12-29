@@ -13,7 +13,7 @@
 #include "game.h"
 
 typedef struct command_struct {
-        char** content;
+        String* content;
         struct sockaddr_in source;
 }* Command;
 
@@ -45,6 +45,5 @@ void interpretAck(Command, Game, ListeningPort);
 //send Command commands
 void sendHere(ListeningPort, struct sockaddr_in);
 void sendAccept(ListeningPort, struct sockaddr_in, int);
-void sendAck(ListeningPort, struct sockaddr_in);
-void sendDelta(ListeningPort, struct sockaddr_in, Delta);
+void sendDelta(ListeningPort, struct sockaddr_in, State, State, int);
 #endif

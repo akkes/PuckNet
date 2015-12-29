@@ -9,6 +9,7 @@
 
 Game createGame(){
         Game newGame = malloc(sizeof(struct game_struct));
+	bzero(newGame, sizeof(struct game_struct));
         newGame->numberOfPlayers = 0;
         newGame->state = 0;
 
@@ -21,9 +22,13 @@ Game createGame(){
 
 void sendToAllPlayers(ListeningPort connection, Game game, String string){
         for (size_t i = 0; i < PLAYERSMAX; i++) {
+#ifdef DEBUG
                 printf("Joueur: %zd\n", i);
+#endif
                 if (getPlayer(game, i) != NULL) {
+#ifdef DEBUG
                         printf("Existe\n");
+#endif
                         sendToPlayer(connection, getPlayer(game,i), string);
                 }
         }
@@ -33,19 +38,22 @@ int addPlayer(Game game, Player player){
         size_t index;
         index = 0;
         while (getPlayer(game, index) != NULL && index < PLAYERSMAX) {
+#ifdef DEBUG
                 printf("On continue %zd\n", index);
+#endif
                 index++;
         }
 
         if (index < PLAYERSMAX) {
-                getState(game, getLastStateID(game))->players[index] = player;
+		game->players[index] = player;
+                addPlayerToState(getLastState(game), player, index);
                 game->numberOfPlayers++;
         }
 
         return index;
 }
 
-void removePlayer(Game game, Player player){
+int removePlayer(Game game, Player player){
         int index;
         index = 0;
         while (getPlayer(game, index) != player && index < PLAYERSMAX) {
@@ -55,6 +63,8 @@ void removePlayer(Game game, Player player){
         if (index != PLAYERSMAX) {
                 getState(game, getLastStateID(game))->players[index] = NULL;
         }
+
+	return index;
 }
 
 int getNumberOfPlayers(Game game){
@@ -73,12 +83,28 @@ int numberOfPlayersAlive(Game game){
 
 State addState(Game game, State state){
         DEBUG("addState");
-        return NULL;
+	game->state++;
+	printf("    stateID: %d\n", game->state);
+
+	//already in memory
+	if(NULL != game->states[game->state%STATESCONSERVED]) {
+		freeState(game->states[game->state%STATESCONSERVED]);
+	}
+
+	//add state
+	game->states[game->state%STATESCONSERVED] = state;
+
+        return state;
 }
 
 State getState(Game game, int stateID){
         DEBUG("getState");
         return game->states[stateID];
+}
+
+State getLastState(Game game){
+        DEBUG("getLastState");
+        return game->states[game->state];
 }
 
 int getLastStateID(Game game){
@@ -88,12 +114,12 @@ int getLastStateID(Game game){
 
 Player getPlayer(Game game, int playerID){
         DEBUG("getPlayer");
-        return getState(game, getLastStateID(game))->players[playerID];
+        return game->players[playerID];
 }
 
-int findPlayerID(Game game, String name){
+int findPlayerID(Game game, struct sockaddr_in addr){
         for (size_t i = 0; (i < PLAYERSMAX) && (NULL != getPlayer(game, i)); i++) {
-		if (0 == strcmp(name, getPlayerName(getPlayer(game, i)))) {
+		if (compareHosts(addr, getPlayerHost(getPlayer(game, i)))) {
 			return i;
 		}
 	}

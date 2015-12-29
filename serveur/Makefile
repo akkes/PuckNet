@@ -15,7 +15,7 @@ OBJECTS= $(DONOTUSE_TEMPOBJ:.c=.o)
 all: server
 
 server: $(OBJECTS) *.h
-	$(CC) $(LDFLAGS) $(DEBUG) $(OBJECTS) -o server
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DEBUG) $(OBJECTS) -o server
 
 .objects/%.o: %.c *.h
 	$(CC) $(CFLAGS) $(DEBUG) -c $< -o $@

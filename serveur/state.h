@@ -11,23 +11,55 @@
 #include "miulib.h"
 #include "player.h"
 
+#define DOTSNUMBER 1
+#define WIDTH 28
+#define HEIGHT 31
+#define SQUARESIZE 256
+
+// Player state
+typedef struct playerState_struct {
+	int lifes;
+	//positions in units
+	int posX;
+	int posY;
+	//up left down right
+	int direction;
+}* PlayerState;
+
+// Dot
+typedef struct dot_struct {
+	int x;
+	int y;
+}* Dot;
+
+// Gum
+typedef struct gum_struct {
+	int x;
+	int y;
+}* Gum;
+
 // State
-typedef struct state_struct{
-        Player players[PLAYERSMAX];
-        int* dots;
-        int* gums;
+typedef struct state_struct {
+	int id;
+        PlayerState players[PLAYERSMAX];
+        Dot dots[DOTSNUMBER];
+        Gum gums[PLAYERSMAX];
 }* State;
-
-// Delta
-typedef struct delta_struct{
-
-}* Delta;
 
 //public
 State createInitialState();
-State createState(State, Delta);
-Delta makeDeltaFromCommand(String*, int);
-Delta makeDeltaFromStates(State, State);
+State createState(State, String*, int);
+State duplicateState(State);
+String makeDeltaFromStates(State, State);
 void freeState(State);
+State createStateAcceptPlayer(State, Player, int);
+
+//private
+Dot createDot(int x, int y);
+Gum createGum(int x, int y);
+PlayerState createPlayerState(Player);
+PlayerState duplicatePlayerState(PlayerState);
+Player addPlayerToState(State, Player, int);
+Player removePlayerFromState(State, int);
 
 #endif

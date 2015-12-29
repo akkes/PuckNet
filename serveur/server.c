@@ -18,6 +18,7 @@ int main ()
         // Game
         do {
                 // Reception d'un message
+		puts("\n");
                 message = receiveMessage(connection);
                 displayMessage(message);
 

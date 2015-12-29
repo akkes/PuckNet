@@ -12,7 +12,6 @@ typedef int Boolean;
 #define CONSTANTS
 
 #define PLAYERSMAX 4
-#define STATESCONSERVED 1024
 #define COLORWIDTH 6
 
 #endif
@@ -27,4 +26,9 @@ typedef int Boolean;
 
 typedef char* String;
 
+#endif
+
+#ifndef TELEMENT
+#define TELEMENT
+typedef int Telement;
 #endif

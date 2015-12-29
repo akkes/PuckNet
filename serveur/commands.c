@@ -8,6 +8,8 @@
 
 #include "commands.h"
 
+extern Game game;
+
 //Should exist in string.h
 int strcnt(String string, char character){
 	DEBUG("strcnt");
@@ -150,7 +152,16 @@ void interpretJoin(Command command, Game game, ListeningPort connection){
 	DEBUG("interpret Join");
 
 	if (game->numberOfPlayers < PLAYERSMAX) {
+		// create player
 		playerNumber = addPlayer(game, createPlayer(command->content[1], command->content[2], command->source));
+
+		// create state
+		State oldState = duplicateState(getLastState(game));
+		State connectionState = createStateAcceptPlayer(oldState, getPlayer(game, playerNumber), playerNumber);
+
+		// add it to the game
+		addState(game, connectionState);
+
 		sendAccept(connection, command->source, playerNumber);
 	} else {
 		sendMessage(connection, command->source, "DENY");
@@ -161,7 +172,7 @@ void interpretReJoin(Command command, Game game, ListeningPort connection){
 	DEBUG("interpret ReJoin");
 
 	//find player number
-	int playerID = findPlayerID(game, command->content[1]);
+	int playerID = findPlayerID(game, command->source);
 
 	//send It
 	if (-1 != playerID) {
@@ -175,32 +186,42 @@ void interpretReJoin(Command command, Game game, ListeningPort connection){
 void interpretAck(Command command, Game game, ListeningPort connection){
 	DEBUG("interpret Ack");
 
+	//find player number
+	int playerID = findPlayerID(game, command->source);
+
 	// create new State
-	State newState = createState(getState(game, 0), makeDeltaFromCommand(command->content, 0));
+	State newState = createState(getLastState(game), command->content+2, playerID);
 	addState(game, newState);
 
 	// get Old State
+	printf("atoi(%s) -> %d\n", command->content[1], atoi(command->content[1]));
 	State oldState = getState(game, atoi(command->content[1]));
 
-	// make delta
-	Delta delta = makeDeltaFromStates(oldState, newState);
-
-	// send It
-	sendDelta(connection, command->source, delta);
+	// send delta
+	sendDelta(connection, command->source, oldState, newState, getLastStateID(game));
 }
 
 //send commands
 void sendHere(ListeningPort connection, struct sockaddr_in addr){
+	DEBUG("sendHere");
 	sendMessage(connection, addr, "HERE");
 }
 
 void sendAccept(ListeningPort connection, struct sockaddr_in addr, int playerNumber){
+	DEBUG("sendAccept");
 	char message[9] = "ACCEPT 0";
-	printf("%d\n", playerNumber);
 	sprintf(message+7, "%d", playerNumber);
 	sendMessage(connection, addr, message);
 }
 
-void sendDelta(ListeningPort connection, struct sockaddr_in addr, Delta delta){
+void sendDelta(ListeningPort connection, struct sockaddr_in addr, State oldState, State newState, int newStateID){
+	DEBUG("sendDelta");
+	String delta = malloc(800 * sizeof(char));
+	bzero(delta, 800 * sizeof(char));
+	sprintf(delta, "DELTA %d", newStateID);
+
+	strcat(delta, makeDeltaFromStates(oldState, newState));
+
+	sendMessage(connection, addr, delta);
 	return;
 }

@@ -15,11 +15,11 @@ typedef char* Color;
 typedef struct player_struct{
 	String name;
 	char color[COLORWIDTH];
-	int lifes;
-	int posX;
-	int posY;
-	int direction;
 	struct sockaddr_in addr;
+	int spawnX;
+	int spawnY;
+	int lifes;
+	int lastACK;
 }* Player;
 
 void sendToPlayer(ListeningPort, Player, String);
