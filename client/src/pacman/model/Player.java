@@ -10,6 +10,7 @@ public class Player {
     private int movementX;
     private int movementY;
     private int nextDirection;
+    private int power;
     protected Game game;
 
     public Player(Game game) {
@@ -23,6 +24,7 @@ public class Player {
         movementX = 1;
         movementY = 0;
         nextDirection = -1;
+        power = 0;
     }
 
     public int getPosX() {
@@ -51,6 +53,14 @@ public class Player {
 
     public void setDirection(int direction) {
         nextDirection = direction;
+    }
+
+    public int getPower() {
+        return power;
+    }
+
+    public void setPower(int power) {
+        this.power = power;
     }
 
     public void update() {

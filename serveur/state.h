@@ -19,6 +19,7 @@
 // Player state
 typedef struct playerState_struct {
 	int lifes;
+	int power;
 	//positions in units
 	int posX;
 	int posY;

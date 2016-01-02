@@ -141,13 +141,31 @@ public class Game {
         for (int i = 0; i < gumsList.length; i++) {
             if (null != gumsList[i] && gumsList[i].equals(eaten)) {
                 gumsList[i] = null;
-                //TODO: tell server
+                networkControler.setGumEated(i);
             }
         }
+
+    }
+
+    public void superEat(int x, int y) {
+        Point eaten = new Point(x/unitsPerSquare,y/unitsPerSquare);
+        for (int i = 0; i < players.length; i++) {
+            if (null != players[i]
+                    && getLocalPlayerID() != i
+                    && players[i].getPosX()/unitsPerSquare == eaten.x
+                    && players[i].getPosY()/unitsPerSquare == eaten.y) {
+                networkControler.setplayerEated(i);
+            }
+        }
+
     }
 
     public void setDotEated(int dotID) {
         dotsList[dotID] = null;
+    }
+
+    public void setGumEated(int gumID) {
+        gumsList[gumID] = null;
     }
 
     public void update() {

@@ -22,6 +22,7 @@ public class NetworkControler {
     private int lastReceivedState;
     private ArrayList<Integer> eatenDotsList = new ArrayList<>();
     private ArrayList<Integer> eatenGumsList = new ArrayList<>();
+    private ArrayList<Integer> eatenPlayersList = new ArrayList<>();
     private Boolean connected;
 
     public NetworkControler(Game game, String address, int port) {
@@ -141,6 +142,18 @@ public class NetworkControler {
                         game.setDotEated(new Integer(serverCommand[index+1]));
 
                         index += 2;
+                    } else if (serverCommand[index].matches("Gum")) {
+                        game.setGumEated(new Integer(serverCommand[index+1]));
+
+                        index += 2;
+                    } else if (serverCommand[index].matches("Super")) {
+                        game.getPlayers()[new Integer(serverCommand[index+1])].setPower(1);
+
+                        index += 2;
+                    } else if (serverCommand[index].matches("Normal")) {
+                        game.getPlayers()[new Integer(serverCommand[index+1])].setPower(0);
+
+                        index += 2;
                     } else {
                         System.out.println("Erreur dans la commande du serveur: " + serverCommand[index]);
                         index ++;
@@ -165,21 +178,37 @@ public class NetworkControler {
         acknowledge += " Y " + game.getLocalPlayer().getPosY();
 
         // Eaten things
+        // Gums
         for(Integer gumID : eatenGumsList) {
             acknowledge += " Gum " + gumID;
         }
         eatenGumsList = new ArrayList<>();
+
+        // Dots
         for(Integer dotID : eatenDotsList) {
             acknowledge += " Dot " + dotID;
         }
         eatenDotsList = new ArrayList<>();
-        // TODO: players
+
+        // Players
+        for(Integer playerID : eatenPlayersList) {
+            acknowledge += " Eat " + playerID;
+        }
+        eatenPlayersList = new ArrayList<>();
 
         sendCommand(acknowledge);
     }
 
     public void setDotEated(int dotID) {
         eatenDotsList.add(dotID);
+    }
+
+    public void setGumEated(int gumID) {
+        eatenGumsList.add(gumID);
+    }
+
+    public void setplayerEated(int playerID) {
+        eatenPlayersList.add(playerID);
     }
 
     public void closeConnexion() {

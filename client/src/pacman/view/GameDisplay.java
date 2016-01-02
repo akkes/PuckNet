@@ -17,8 +17,10 @@ public class GameDisplay extends JPanel implements ActionListener {
     private int squareSize = 24;
     private int dotSize = squareSize/4;
     private int gumSize = squareSize/2;
+    private int margin = squareSize/4;
 
     private Image pacman;
+    private Image superPacman;
 
     private Timer timer;
 
@@ -28,6 +30,7 @@ public class GameDisplay extends JPanel implements ActionListener {
         setBackground(Color.black);
         this.game = game;
         pacman = new ImageIcon("./src/images/Pacman.gif").getImage().getScaledInstance(squareSize, squareSize, 0);
+        superPacman = pacman.getScaledInstance(squareSize + 2*margin, squareSize + 2*margin, 0 );
 
         timer = new Timer(16, this);//vitesse du jeu
         timer.start();
@@ -76,7 +79,12 @@ public class GameDisplay extends JPanel implements ActionListener {
         //TODO: On verra après pour un truc beau
         for(Player player : game.getPlayers()) {
             if (null != player) {
-                g2d.drawImage(pacman, squareSize * player.getPosX() / Game.unitsPerSquare, squareSize * player.getPosY() / Game.unitsPerSquare, this);
+                if (1 == player.getPower()) {
+                    g2d.drawImage(superPacman, squareSize * player.getPosX() / Game.unitsPerSquare - margin,
+                            squareSize * player.getPosY() / Game.unitsPerSquare - margin, this);
+                } else {
+                    g2d.drawImage(pacman, squareSize * player.getPosX() / Game.unitsPerSquare, squareSize * player.getPosY() / Game.unitsPerSquare, this);
+                }
             }
         }
     }

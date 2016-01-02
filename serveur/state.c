@@ -45,6 +45,7 @@ PlayerState createPlayerState(Player player) {
 	playerState->posX = player->spawnX;
 	playerState->posY = player->spawnY;
 	playerState->lifes = player->lifes;
+	playerState->power = 0;
 	return playerState;
 }
 
@@ -59,6 +60,7 @@ PlayerState duplicatePlayerState(PlayerState oldPlayerState) {
 		newPlayerState->posX = oldPlayerState->posX;
 		newPlayerState->posY = oldPlayerState->posY;
 		newPlayerState->lifes = oldPlayerState->lifes;
+		newPlayerState->power = oldPlayerState->power;
 	}
 
 	return newPlayerState;
@@ -114,10 +116,14 @@ State createState(State oldState, String* command, int player) {
 		} else if (0 == strcmp(command[index], "Gum")) {
 			printf("    Gum");
 			newState->gums[atoi(command[index+1])] = NULL;
+			newState->players[player]->power = 1;
 			index++;
 		} else if (0 == strcmp(command[index], "Eat")) {
 			printf("    Eat");
 			placeHolder = atoi(command[index+1]);
+			newState->players[atoi(command[index+1])]->lifes--;
+			newState->players[atoi(command[index+1])]->posX = 2*15;
+			newState->players[atoi(command[index+1])]->posY = 14*15;
 			printf(" %d\n", placeHolder);
 			index++;
 		} else if (0 == strcmp(command[index], "Score")) {
@@ -194,6 +200,18 @@ String makeDeltaFromStates(State oldState, State newState) {
 			if (oldState->players[i]->posY != newState->players[i]->posY) {
 				sprintf(temp, " Y %d %d",
 					(int) i, newState->players[i]->posY);
+				strcat(delta, temp);
+			}
+
+			printf("%d != %d\n", oldState->players[i]->power, newState->players[i]->power);
+			if (oldState->players[i]->power != newState->players[i]->power) {
+				if (1 == newState->players[i]->power) {
+					sprintf(temp, " Super %d",
+						(int) i);
+				} else {
+					sprintf(temp, " Normal %d",
+						(int) i);
+				}
 				strcat(delta, temp);
 			}
 		} else if (NULL != oldState->players[i] && NULL == newState->players[i]) {
