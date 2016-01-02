@@ -11,10 +11,10 @@
 #include "miulib.h"
 #include "player.h"
 
-#define DOTSNUMBER 1
+#define DOTSNUMBER 80
 #define WIDTH 28
 #define HEIGHT 31
-#define SQUARESIZE 256
+#define SQUARESIZE 15
 
 // Player state
 typedef struct playerState_struct {
@@ -22,8 +22,6 @@ typedef struct playerState_struct {
 	//positions in units
 	int posX;
 	int posY;
-	//up left down right
-	int direction;
 }* PlayerState;
 
 // Dot

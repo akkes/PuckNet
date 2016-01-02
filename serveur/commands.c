@@ -195,7 +195,7 @@ void interpretAck(Command command, Game game, ListeningPort connection){
 
 	// get Old State
 	printf("atoi(%s) -> %d\n", command->content[1], atoi(command->content[1]));
-	State oldState = getState(game, atoi(command->content[1]));
+	State oldState = getState(game, atoi(command->content[1]) -1);
 
 	// send delta
 	sendDelta(connection, command->source, oldState, newState, getLastStateID(game));

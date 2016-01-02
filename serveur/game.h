@@ -18,6 +18,7 @@ typedef struct game_struct{
 	int numberOfPlayers;
 	Player players[PLAYERSMAX];
 	int state;
+	State initialState;
 	State states[STATESCONSERVED];
 }* Game;
 

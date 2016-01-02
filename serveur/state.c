@@ -45,12 +45,11 @@ PlayerState createPlayerState(Player player) {
 	playerState->posX = player->spawnX;
 	playerState->posY = player->spawnY;
 	playerState->lifes = player->lifes;
-	playerState->direction = 1;
 	return playerState;
 }
 
 PlayerState duplicatePlayerState(PlayerState oldPlayerState) {
-	DEBUG("duplicatePlayerState");
+	//DEBUG("duplicatePlayerState");
 	PlayerState newPlayerState = NULL;
 
 	if (NULL != oldPlayerState) {
@@ -60,10 +59,34 @@ PlayerState duplicatePlayerState(PlayerState oldPlayerState) {
 		newPlayerState->posX = oldPlayerState->posX;
 		newPlayerState->posY = oldPlayerState->posY;
 		newPlayerState->lifes = oldPlayerState->lifes;
-		newPlayerState->direction = oldPlayerState->direction;
 	}
 
 	return newPlayerState;
+}
+
+State duplicateState(State originalState) {
+	DEBUG("duplicateState");
+	State duplicateState = malloc(sizeof(struct state_struct));
+	bzero(duplicateState, sizeof(struct state_struct));
+
+	// add players
+	for (size_t i = 0; i < PLAYERSMAX; i++) {
+		duplicateState->players[i] = duplicatePlayerState(originalState->players[i]);
+	}
+
+	// add dots
+	for (size_t i = 0; i < DOTSNUMBER; i++) {
+		duplicateState->dots[i] = originalState->dots[i];
+	}
+
+	// add gums
+	for (size_t i = 0; i < PLAYERSMAX; i++) {
+		duplicateState->gums[i] = originalState->gums[i];
+	}
+
+	duplicateState->id = originalState->id;
+
+	return duplicateState;
 }
 
 State createState(State oldState, String* command, int player) {
@@ -83,11 +106,6 @@ State createState(State oldState, String* command, int player) {
 			printf("    Y");
 			newState->players[player]->posY = atoi(command[index+1]);
 			printf(" %d\n", newState->players[player]->posY);
-			index++;
-		} else if (0 == strcmp(command[index], "Direction")) {
-			printf("    Direction");
-			newState->players[player]->direction = atoi(command[index+1]);
-			printf(" %d\n", newState->players[player]->direction);
 			index++;
 		} else if (0 == strcmp(command[index], "Dot")) {
 			printf("    Dot");
@@ -115,31 +133,6 @@ State createState(State oldState, String* command, int player) {
 		index++;
 	}
 	return newState;
-}
-
-State duplicateState(State originalState) {
-	DEBUG("duplicateState");
-	State duplicateState = malloc(sizeof(struct state_struct));
-	bzero(duplicateState, sizeof(struct state_struct));
-
-	// add players
-	for (size_t i = 0; i < PLAYERSMAX; i++) {
-		duplicateState->players[i] = duplicatePlayerState(originalState->players[i]);
-	}
-
-	// add dots
-	for (size_t i = 0; i < DOTSNUMBER; i++) {
-		duplicateState->dots[i] = originalState->dots[i];
-	}
-
-	// add gums
-	for (size_t i = 0; i < PLAYERSMAX; i++) {
-		duplicateState->gums[i] = originalState->gums[i];
-	}
-
-	duplicateState->id = originalState->id;
-
-	return duplicateState;
 }
 
 State createStateAcceptPlayer(State oldState, Player newPlayer, int playerID) {
@@ -184,13 +177,8 @@ String makeDeltaFromStates(State oldState, State newState) {
 		if (NULL == oldState->players[i] && NULL != newState->players[i]) {
 			DEBUG("    born");
 
-			if (NULL != newState->players[i]) {
-				sprintf(temp, " X %d %d Y %d %d Direction %d %d",
-					(int) i, newState->players[i]->posX,
-					(int) i, newState->players[i]->posY,
-					(int) i, newState->players[i]->direction);
-				strcat(delta, temp);
-			}
+			sprintf(temp, " NewPlayer %d fake FA7E55", (int) i);
+			strcat(delta, temp);
 		} else if(NULL != oldState->players[i] && NULL != newState->players[i]) {
 			DEBUG("    still alive");
 
@@ -207,13 +195,6 @@ String makeDeltaFromStates(State oldState, State newState) {
 					(int) i, newState->players[i]->posY);
 				strcat(delta, temp);
 			}
-
-			printf("%d != %d\n", oldState->players[i]->direction, newState->players[i]->direction);
-			if (oldState->players[i]->direction != newState->players[i]->direction) {
-				sprintf(temp, " Direction %d %d",
-					(int) i, newState->players[i]->direction);
-				strcat(delta, temp);
-			}
 		} else if (NULL != oldState->players[i] && NULL == newState->players[i]) {
 			DEBUG("    eaten");
 			// TODO: eaten
@@ -222,9 +203,23 @@ String makeDeltaFromStates(State oldState, State newState) {
 		}
 	}
 
-	// dots
-
 	// gums
+	for (size_t i = 0; i < PLAYERSMAX; i++) {
+		if (NULL == newState->gums[i] && NULL != oldState->gums[i]) {
+			sprintf(temp, " Gum %d",
+				(int) i);
+			strcat(delta, temp);
+		}
+	}
+
+	// dots
+	for (size_t i = 0; i < DOTSNUMBER; i++) {
+		if (NULL == newState->dots[i] && NULL != oldState->dots[i]) {
+			sprintf(temp, " Dot %d",
+				(int) i);
+			strcat(delta, temp);
+		}
+	}
 
 	return delta;
 }

@@ -13,8 +13,9 @@ Game createGame(){
         newGame->numberOfPlayers = 0;
         newGame->state = 0;
 
-        bzero(newGame->states, STATESCONSERVED * sizeof(State));
+	newGame->initialState = createInitialState();
 
+        bzero(newGame->states, STATESCONSERVED * sizeof(State));
         newGame->states[newGame->state] = createInitialState();
 
         return newGame;
@@ -84,7 +85,7 @@ int numberOfPlayersAlive(Game game){
 State addState(Game game, State state){
         DEBUG("addState");
 	game->state++;
-	printf("    stateID: %d\n", game->state);
+	printf("    stateID: %d/%D\n", game->state, state->id);
 
 	//already in memory
 	if(NULL != game->states[game->state%STATESCONSERVED]) {
@@ -99,12 +100,16 @@ State addState(Game game, State state){
 
 State getState(Game game, int stateID){
         DEBUG("getState");
-        return game->states[stateID];
+	printf("        state: %d - %d\n", stateID, game->states[stateID%STATESCONSERVED]->id);
+	if (0 >= stateID) {
+		return game->initialState;
+	}
+        return game->states[stateID%STATESCONSERVED];
 }
 
 State getLastState(Game game){
         DEBUG("getLastState");
-        return game->states[game->state];
+        return game->states[game->state%STATESCONSERVED];
 }
 
 int getLastStateID(Game game){
