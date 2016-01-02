@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "miulib.h"
 #include "player.h"
 
@@ -20,6 +21,7 @@
 typedef struct playerState_struct {
 	int lifes;
 	int power;
+	time_t powerTime;
 	//positions in units
 	int posX;
 	int posY;

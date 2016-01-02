@@ -167,6 +167,7 @@ public class NetworkControler {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Le serveur est déconnecté");
         }
 
         // Send State

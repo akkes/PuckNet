@@ -15,6 +15,8 @@ public class LocalPlayer extends Player {
 
         // Eating (gums/dots/players)
         game.eat(posX + Game.unitsPerSquare/2, posY + Game.unitsPerSquare/2);
-        game.superEat(posX + Game.unitsPerSquare/2, posY + Game.unitsPerSquare/2);
+        if (1 == getPower()) {
+            game.superEat(posX + Game.unitsPerSquare / 2, posY + Game.unitsPerSquare / 2);
+        }
     }
 }

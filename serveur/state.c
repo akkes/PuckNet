@@ -46,6 +46,7 @@ PlayerState createPlayerState(Player player) {
 	playerState->posY = player->spawnY;
 	playerState->lifes = player->lifes;
 	playerState->power = 0;
+	playerState->powerTime = time(NULL);
 	return playerState;
 }
 
@@ -61,6 +62,7 @@ PlayerState duplicatePlayerState(PlayerState oldPlayerState) {
 		newPlayerState->posY = oldPlayerState->posY;
 		newPlayerState->lifes = oldPlayerState->lifes;
 		newPlayerState->power = oldPlayerState->power;
+		newPlayerState->powerTime = oldPlayerState->powerTime;
 	}
 
 	return newPlayerState;
@@ -94,8 +96,24 @@ State duplicateState(State originalState) {
 State createState(State oldState, String* command, int player) {
 	DEBUG("createState");
 	printf("    oldStateID: %d\n", oldState->id);
+
+	// Make the state
 	State newState = duplicateState(oldState);
 	newState->id++;
+
+	// end of Super
+	time_t now;
+	now = time(NULL);
+	for (size_t i = 0; i < PLAYERSMAX; i++) {
+		if (NULL != newState->players[i]) {
+			printf("%ld - %ld = %lf\n", now, newState->players[i]->powerTime, difftime(now, newState->players[i]->powerTime));
+			if (difftime(now, newState->players[i]->powerTime) > 10) {
+				newState->players[i]->power = 0;
+			}
+		}
+	}
+
+	// parse new events
 	printf("    newStateID: %d\n", newState->id);
 	int placeHolder, index = 0;
 	while (NULL != command[index]) {
@@ -117,6 +135,7 @@ State createState(State oldState, String* command, int player) {
 			printf("    Gum");
 			newState->gums[atoi(command[index+1])] = NULL;
 			newState->players[player]->power = 1;
+			newState->players[player]->powerTime = time(NULL);
 			index++;
 		} else if (0 == strcmp(command[index], "Eat")) {
 			printf("    Eat");
