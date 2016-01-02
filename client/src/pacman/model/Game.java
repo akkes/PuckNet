@@ -1,5 +1,7 @@
 package pacman.model;
 
+import pacman.controler.NetworkControler;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -35,33 +37,40 @@ public class Game {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
     };
 
-    private ArrayList<Point> originalDotsList = new ArrayList<>();
-    private ArrayList<Point> originalGumsList = new ArrayList<>();
+    private final Point[] originalDotsList = new Point[80];
+    private final Point[] originalGumsList = new Point[5];
 
-    private ArrayList<Point> dotsList;
-    private ArrayList<Point> gumsList;
+    private Point[] dotsList = new Point[80];
+    private Point[] gumsList = new Point[5];
 
     private int localPlayerID = 0;
     private Player[] players = new Player[5];
 
+    private NetworkControler networkControler;
+
     public Game() {
-        players[0] = new Player(this);
-
         // Gums list
-        originalGumsList.add(new Point(1, 3));
+        originalGumsList[0] = new Point(1, 3);
 
-        gumsList = (ArrayList<Point>) originalGumsList.clone();
+        gumsList = originalGumsList.clone();
 
         // Dots list
+        int index = 0;
         for (int i = 1; i <= 12; i++) {
-            originalDotsList.add(new Point(i, 1));
+            originalDotsList[index] = new Point(i, 1);
+            index++;
         }
         for (int i = 2; i <= 14; i++) {
-            originalDotsList.add(new Point(6, i));
+            originalDotsList[index] = new Point(6, i);
+            index++;
         }
-        originalDotsList.add(new Point(1, 2));
+        originalDotsList[index] = new Point(1, 2);
 
-        dotsList = (ArrayList<Point>) originalDotsList.clone();
+        dotsList = originalDotsList.clone();
+    }
+
+    public void setNetworkControler(NetworkControler networkControler) {
+        this.networkControler = networkControler;
     }
 
     public Player[] getPlayers() {
@@ -69,7 +78,9 @@ public class Game {
     }
 
     public void setPlayer(int id, Player player) {
-        players[id] = player;
+        if (id != localPlayerID) {
+            players[id] = player;
+        }
     }
 
     public int getLocalPlayerID() {
@@ -82,17 +93,18 @@ public class Game {
 
     public void setLocalPlayerID(int localPlayerID) {
         this.localPlayerID = localPlayerID;
+        this.players[localPlayerID] = new LocalPlayer(this);
     }
 
     public short[] getDonneesCarte() {
         return donneesCarte;
     }
 
-    public ArrayList<Point> getDotsList() {
+    public Point[] getDotsList() {
         return dotsList;
     }
 
-    public ArrayList<Point> getGumsList() {
+    public Point[] getGumsList() {
         return gumsList;
     }
 
@@ -119,19 +131,23 @@ public class Game {
     public void eat(int x, int y) {
         Point eaten = new Point(x/unitsPerSquare,y/unitsPerSquare);
 
-        for (int i = 0; i < dotsList.size(); i++) {
-            if (dotsList.get(i).equals(eaten)) {
-                dotsList.remove(i);
-                //TODO: tell server
+        for (int i = 0; i < dotsList.length; i++) {
+            if (null != dotsList[i] && dotsList[i].equals(eaten)) {
+                dotsList[i] = null;
+                networkControler.setDotEated(i);
             }
         }
 
-        for (int i = 0; i < gumsList.size(); i++) {
-            if (gumsList.get(i).equals(eaten)) {
-                gumsList.remove(i);
+        for (int i = 0; i < gumsList.length; i++) {
+            if (null != gumsList[i] && gumsList[i].equals(eaten)) {
+                gumsList[i] = null;
                 //TODO: tell server
             }
         }
+    }
+
+    public void setDotEated(int dotID) {
+        dotsList[dotID] = null;
     }
 
     public void update() {

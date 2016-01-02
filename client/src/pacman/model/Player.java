@@ -5,12 +5,12 @@ package pacman.model;
  */
 
 public class Player {
-    private int posX;
-    private int posY;
+    protected int posX;
+    protected int posY;
     private int movementX;
     private int movementY;
     private int nextDirection;
-    private Game game;
+    protected Game game;
 
     public Player(Game game) {
         this.game = game;
@@ -116,8 +116,5 @@ public class Player {
                 posY = newY;
             }
         }
-
-        // Dots eating
-        game.eat(posX + Game.unitsPerSquare/2, posY + Game.unitsPerSquare/2);
     }
 }

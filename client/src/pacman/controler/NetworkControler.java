@@ -3,8 +3,10 @@ package pacman.controler;
 import pacman.model.Game;
 import pacman.model.Player;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,6 +20,9 @@ public class NetworkControler {
     private int port;
     private InetAddress ip;
     private int lastReceivedState;
+    private ArrayList<Integer> eatenDotsList = new ArrayList<>();
+    private ArrayList<Integer> eatenGumsList = new ArrayList<>();
+    private Boolean connected;
 
     public NetworkControler(Game game, String address, int port) {
         this.game = game;
@@ -49,6 +54,11 @@ public class NetworkControler {
         // define local playerID
         if (commandContent[0].matches("ACCEPT")) {
             game.setLocalPlayerID(new Integer(commandContent[1]));
+            connected = true;
+        } else {
+            JOptionPane.showMessageDialog(null, "Le serveur n'a plus de place");
+            connected = false;
+
         }
 
         // send first ACK to start communication
@@ -62,6 +72,10 @@ public class NetworkControler {
                 syncWithServer();
             }
         }, 1000/60, 1000/60);
+    }
+    
+    public Boolean isConnected() {
+        return this.connected;
     }
 
     void sendCommand(String command){
@@ -116,9 +130,20 @@ public class NetworkControler {
                         index += 3;
                     } else if (serverCommand[index].matches("NewPlayer")) {
                         int playerID = new Integer(serverCommand[index+1]);
+                        int posX = new Integer(serverCommand[index+2]);
+                        int posY = new Integer(serverCommand[index+3]);
                         game.setPlayer(playerID, new Player(game));
+                        game.getPlayers()[playerID].setPosX(posX);
+                        game.getPlayers()[playerID].setPosY(posY);
 
-                        index += 4;
+                        index += 6;
+                    } else if (serverCommand[index].matches("Dot")) {
+                        game.setDotEated(new Integer(serverCommand[index+1]));
+
+                        index += 2;
+                    } else {
+                        System.out.println("Erreur dans la commande du serveur: " + serverCommand[index]);
+                        index ++;
                     }
                 }
 
@@ -135,11 +160,26 @@ public class NetworkControler {
         String acknowledge = "ACK ";
         acknowledge += lastReceivedState;
 
-        // Xpos
+        // Position
         acknowledge += " X " + game.getLocalPlayer().getPosX();
         acknowledge += " Y " + game.getLocalPlayer().getPosY();
 
+        // Eaten things
+        for(Integer gumID : eatenGumsList) {
+            acknowledge += " Gum " + gumID;
+        }
+        eatenGumsList = new ArrayList<>();
+        for(Integer dotID : eatenDotsList) {
+            acknowledge += " Dot " + dotID;
+        }
+        eatenDotsList = new ArrayList<>();
+        // TODO: players
+
         sendCommand(acknowledge);
+    }
+
+    public void setDotEated(int dotID) {
+        eatenDotsList.add(dotID);
     }
 
     public void closeConnexion() {

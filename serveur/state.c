@@ -177,7 +177,8 @@ String makeDeltaFromStates(State oldState, State newState) {
 		if (NULL == oldState->players[i] && NULL != newState->players[i]) {
 			DEBUG("    born");
 
-			sprintf(temp, " NewPlayer %d fake FA7E55", (int) i);
+			sprintf(temp, " NewPlayer %d %d %d fake FA7E55",
+				(int) i, newState->players[i]->posX, newState->players[i]->posY);
 			strcat(delta, temp);
 		} else if(NULL != oldState->players[i] && NULL != newState->players[i]) {
 			DEBUG("    still alive");

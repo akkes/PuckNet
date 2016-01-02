@@ -58,13 +58,17 @@ public class GameDisplay extends JPanel implements ActionListener {
 
         // gums display
         for(Point gum : game.getGumsList()) {
-            g2d.setColor(Color.yellow);
-            g2d.fillOval((gum.x * squareSize) + (squareSize-gumSize)/2, (gum.y * squareSize) + (squareSize-gumSize)/2, gumSize, gumSize);
+            if (null != gum) {
+                g2d.setColor(Color.yellow);
+                g2d.fillOval((gum.x * squareSize) + (squareSize - gumSize) / 2, (gum.y * squareSize) + (squareSize - gumSize) / 2, gumSize, gumSize);
+            }
         }
 
         for (Point dot : game.getDotsList()) {
-            g2d.setColor(Color.yellow);
-            g2d.fillOval((dot.x * squareSize) + (squareSize-dotSize)/2, (dot.y * squareSize) + (squareSize-dotSize)/2, dotSize, dotSize);
+            if (null != dot) {
+                g2d.setColor(Color.yellow);
+                g2d.fillOval((dot.x * squareSize) + (squareSize - dotSize) / 2, (dot.y * squareSize) + (squareSize - dotSize) / 2, dotSize, dotSize);
+            }
         }
     }
 
