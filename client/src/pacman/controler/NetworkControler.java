@@ -83,7 +83,7 @@ public class NetworkControler {
         //TODO: code de la prof, faire la classe en vrai
         byte[] buf = command.getBytes() ;
         DatagramPacket packet = new DatagramPacket(buf, buf.length, ip, port);
-        System.out.println ("On envoi au serveur: " + command) ;
+        System.out.println ("-> " + command) ;
         try {
             socket.send(packet);
         } catch (IOException e) {
@@ -98,7 +98,7 @@ public class NetworkControler {
 
         // Affiche la reponse
         String received = new String (packet.getData ()) ;
-        System.out.println ("Le serveur à répondu: " + received) ;
+        System.out.println ("<- " + received) ;
         return received;
     }
 
@@ -112,7 +112,7 @@ public class NetworkControler {
             if (serverCommand[0].matches("DELTA")) {
                 int index = 2;
                 int receivedState = new Integer(serverCommand[1]);
-                if (receivedState > this.lastReceivedState) {
+                if (receivedState >= this.lastReceivedState) {
                     this.lastReceivedState = receivedState;
 
                     while (index < serverCommand.length) {

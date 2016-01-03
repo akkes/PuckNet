@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.ImageObserver;
+import java.net.URL;
 
 /**
  * Created by akkes on 31/12/2015.
@@ -29,7 +30,9 @@ public class GameDisplay extends JPanel implements ActionListener {
         setDoubleBuffered(true);
         setBackground(Color.black);
         this.game = game;
-        pacman = new ImageIcon("./src/images/Pacman.gif").getImage().getScaledInstance(squareSize, squareSize, 0);
+        pacman = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/Pacman.gif"));
+
+        pacman = pacman.getScaledInstance(squareSize, squareSize, 0);
         superPacman = pacman.getScaledInstance(squareSize + 2*margin, squareSize + 2*margin, 0 );
 
         timer = new Timer(16, this);//vitesse du jeu

@@ -493,11 +493,15 @@ public class Game {
     }
 
     public void setDotEated(int dotID) {
-        dotsList[dotID] = null;
+        if (0 < dotID && dotID < dotsList.length) {
+            dotsList[dotID] = null;
+        }
     }
 
     public void setGumEated(int gumID) {
-        gumsList[gumID] = null;
+        if (0 < gumID && gumID < dotsList.length) {
+            gumsList[gumID] = null;
+        }
     }
 
     public void update() {
