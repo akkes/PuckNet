@@ -25,8 +25,8 @@ Player createPlayer(String name, Color color, struct sockaddr_in addr, int lastA
 	memcpy(newPlayer->color, color, 6);
 	newPlayer->addr = addr;
 	newPlayer->lifes = 1;
-	newPlayer->spawnX = 2 * 15;
-	newPlayer->spawnY = 14 * 15;
+	newPlayer->spawnX = 14 * 15;
+	newPlayer->spawnY = 17 * 15;
 	newPlayer->lastACK = lastACK;
 
 	return newPlayer;

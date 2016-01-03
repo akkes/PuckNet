@@ -32,7 +32,8 @@ public class PuckNet extends JFrame {
         add(gameDisplay);
         setTitle("PuckNet");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setSize(500, 500);
+        setSize(game.getMapWidth() * gameDisplay.getSquareSize(),
+                (game.getMapHeight()+1) * gameDisplay.getSquareSize());
         setBackground(Color.black);
         setLocationRelativeTo(null);
         setVisible(true);

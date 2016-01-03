@@ -36,6 +36,10 @@ public class GameDisplay extends JPanel implements ActionListener {
         timer.start();
     }
 
+    public int getSquareSize() {
+        return squareSize;
+    }
+
     private void drawMap(Graphics2D g2d) {
 
         short i = 0;
