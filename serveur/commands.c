@@ -196,26 +196,27 @@ void interpretReJoin(Command command, Game game, ListeningPort connection){
 void interpretAck(Command command, Game game, ListeningPort connection){
 	DEBUG("interpret Ack");
 
-	//find player number
+	//find player number and stateID
 	int playerID = findPlayerID(game, command->source);
-
-	// change lastACK heard of
 	int newLastACK = atoi(command->content[1]);
-	if (newLastACK > 0) {
+
+	if (newLastACK > game->players[playerID]->lastACK
+			|| 0 == newLastACK) {
+		// change lastACK heard of
 		game->players[playerID]->lastACK = newLastACK;
 		game->players[playerID]->lastACKTime = time(NULL);
+
+		// create new State
+		State newState = createState(getLastState(game), command->content+2, playerID);
+		addState(game, newState);
+
+		// get Old State
+		printf("atoi(%s) -> %d\n", command->content[1], atoi(command->content[1]));
+		State oldState = getState(game, atoi(command->content[1]) -1);
+
+		// send delta
+		sendDelta(connection, command->source, oldState, newState, getLastStateID(game));
 	}
-
-	// create new State
-	State newState = createState(getLastState(game), command->content+2, playerID);
-	addState(game, newState);
-
-	// get Old State
-	printf("atoi(%s) -> %d\n", command->content[1], atoi(command->content[1]));
-	State oldState = getState(game, atoi(command->content[1]) -1);
-
-	// send delta
-	sendDelta(connection, command->source, oldState, newState, getLastStateID(game));
 }
 
 void interpretReset(Command command, Game game, ListeningPort connection){

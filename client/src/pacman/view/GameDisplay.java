@@ -17,7 +17,7 @@ public class GameDisplay extends JPanel implements ActionListener {
     private int squareSize = 24;
     private int dotSize = squareSize/4;
     private int gumSize = squareSize/2;
-    private int margin = squareSize/4;
+    private int margin = squareSize/4 +1;
 
     private Image pacman;
     private Image superPacman;

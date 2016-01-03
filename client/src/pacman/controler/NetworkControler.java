@@ -72,7 +72,7 @@ public class NetworkControler {
             public void run() {
                 syncWithServer();
             }
-        }, 1000/60, 1000/60);
+        }, 1000/30, 1000/30);
     }
     
     public Boolean isConnected() {
@@ -111,76 +111,75 @@ public class NetworkControler {
             // Interpret Delta
             if (serverCommand[0].matches("DELTA")) {
                 int index = 2;
-
-                while (index < serverCommand.length) {
-                    if (serverCommand[index].matches("X")) {
-                        int playerID = new Integer(serverCommand[index+1]);
-                        int posX = new Integer(serverCommand[index+2]);
-                        if (playerID != game.getLocalPlayerID()) {
-                            game.getPlayers()[playerID].setPosX(posX);
-                        }
-
-                        index += 3;
-                    } else if (serverCommand[index].matches("Y")) {
-                        int playerID = new Integer(serverCommand[index+1]);
-                        int posY = new Integer(serverCommand[index+2]);
-                        if (playerID != game.getLocalPlayerID()) {
-                            game.getPlayers()[playerID].setPosY(posY);
-                        }
-
-                        index += 3;
-                    } else if (serverCommand[index].matches("NewPlayer")) {
-                        int playerID = new Integer(serverCommand[index+1]);
-                        int posX = new Integer(serverCommand[index+2]);
-                        int posY = new Integer(serverCommand[index+3]);
-                        game.setPlayer(playerID, new Player(game));
-                        game.getPlayers()[playerID].setPosX(posX);
-                        game.getPlayers()[playerID].setPosY(posY);
-
-                        index += 6;
-                    } else if (serverCommand[index].matches("Dot")) {
-                        game.setDotEated(new Integer(serverCommand[index+1]));
-
-                        index += 2;
-                    } else if (serverCommand[index].matches("Gum")) {
-                        game.setGumEated(new Integer(serverCommand[index+1]));
-
-                        index += 2;
-                    } else if (serverCommand[index].matches("Super")) {
-                        game.getPlayers()[new Integer(serverCommand[index+1])].setPower(1);
-
-                        index += 2;
-                    } else if (serverCommand[index].matches("Normal")) {
-                        game.getPlayers()[new Integer(serverCommand[index+1])].setPower(0);
-
-                        index += 2;
-                    } else if (serverCommand[index].matches("Leave")) {
-                        game.setPlayer(new Integer(serverCommand[index+1]), null);
-
-                        index += 2;
-                    } else if (serverCommand[index].matches("Eaten")) {
-                        int playerID = new Integer(serverCommand[index+1]);
-                        game.getPlayers()[playerID].setPosX(game.getSpawnX());
-                        game.getPlayers()[playerID].setPosY(game.getSpawnY());
-
-                        index += 2;
-                    } else if (serverCommand[index].matches("NewDot")) {
-                        int dotID = new Integer(serverCommand[index+1]);
-                        game.addNewDot(dotID);
-                        index += 2;
-                    } else if (serverCommand[index].matches("NewGum")) {
-                        int gumID = new Integer(serverCommand[index+1]);
-                        game.addNewGum(gumID);
-                        index += 2;
-                    } else {
-                        System.out.println("Erreur dans la commande du serveur: " + serverCommand[index]);
-                        index ++;
-                    }
-                }
-
                 int receivedState = new Integer(serverCommand[1]);
-                if (receivedState > lastReceivedState) {
-                    lastReceivedState = receivedState;
+                if (receivedState > this.lastReceivedState) {
+                    this.lastReceivedState = receivedState;
+
+                    while (index < serverCommand.length) {
+                        if (serverCommand[index].matches("X")) {
+                            int playerID = new Integer(serverCommand[index + 1]);
+                            int posX = new Integer(serverCommand[index + 2]);
+                            if (playerID != game.getLocalPlayerID()) {
+                                game.getPlayers()[playerID].setPosX(posX);
+                            }
+
+                            index += 3;
+                        } else if (serverCommand[index].matches("Y")) {
+                            int playerID = new Integer(serverCommand[index + 1]);
+                            int posY = new Integer(serverCommand[index + 2]);
+                            if (playerID != game.getLocalPlayerID()) {
+                                game.getPlayers()[playerID].setPosY(posY);
+                            }
+
+                            index += 3;
+                        } else if (serverCommand[index].matches("NewPlayer")) {
+                            int playerID = new Integer(serverCommand[index + 1]);
+                            int posX = new Integer(serverCommand[index + 2]);
+                            int posY = new Integer(serverCommand[index + 3]);
+                            game.setPlayer(playerID, new Player(game));
+                            game.getPlayers()[playerID].setPosX(posX);
+                            game.getPlayers()[playerID].setPosY(posY);
+
+                            index += 6;
+                        } else if (serverCommand[index].matches("Dot")) {
+                            game.setDotEated(new Integer(serverCommand[index + 1]));
+
+                            index += 2;
+                        } else if (serverCommand[index].matches("Gum")) {
+                            game.setGumEated(new Integer(serverCommand[index + 1]));
+
+                            index += 2;
+                        } else if (serverCommand[index].matches("Super")) {
+                            game.getPlayers()[new Integer(serverCommand[index + 1])].setPower(1);
+
+                            index += 2;
+                        } else if (serverCommand[index].matches("Normal")) {
+                            game.getPlayers()[new Integer(serverCommand[index + 1])].setPower(0);
+
+                            index += 2;
+                        } else if (serverCommand[index].matches("Leave")) {
+                            game.setPlayer(new Integer(serverCommand[index + 1]), null);
+
+                            index += 2;
+                        } else if (serverCommand[index].matches("Eaten")) {
+                            int playerID = new Integer(serverCommand[index + 1]);
+                            game.getPlayers()[playerID].setPosX(game.getSpawnX());
+                            game.getPlayers()[playerID].setPosY(game.getSpawnY());
+
+                            index += 2;
+                        } else if (serverCommand[index].matches("NewDot")) {
+                            int dotID = new Integer(serverCommand[index + 1]);
+                            game.addNewDot(dotID);
+                            index += 2;
+                        } else if (serverCommand[index].matches("NewGum")) {
+                            int gumID = new Integer(serverCommand[index + 1]);
+                            game.addNewGum(gumID);
+                            index += 2;
+                        } else {
+                            System.out.println("Erreur dans la commande du serveur: " + serverCommand[index]);
+                            index++;
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
