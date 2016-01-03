@@ -11,6 +11,7 @@ public class Player {
     private int movementY;
     private int nextDirection;
     private int power;
+    private int powerTime;
     protected Game game;
 
     public Player(Game game) {
@@ -25,6 +26,7 @@ public class Player {
         movementY = 0;
         nextDirection = -1;
         power = 0;
+        powerTime = 0;
     }
 
     public int getPosX() {
@@ -59,8 +61,15 @@ public class Player {
         return power;
     }
 
+    public int getPowerTime() {
+        return powerTime;
+    }
+
     public void setPower(int power) {
         this.power = power;
+        if (1 == power) {
+            powerTime = 10 * 60;
+        }
     }
 
     public void update() {
@@ -125,6 +134,10 @@ public class Player {
                     && 1 != game.getUnit(newX + Game.unitsPerSquare-1, newY)) {
                 posY = newY;
             }
+        }
+
+        if (1 == getPower()) {
+            powerTime--;
         }
     }
 }

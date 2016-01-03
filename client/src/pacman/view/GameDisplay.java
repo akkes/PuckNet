@@ -46,17 +46,100 @@ public class GameDisplay extends JPanel implements ActionListener {
         int x, y;
         short[] map = game.getDonneesCarte();
 
-        for (y = 0; y < game.getMapHeight() * squareSize; y += squareSize) {
-            for (x = 0; x < game.getMapWidth() * squareSize; x += squareSize) {
+        for (y = 0; y < game.getMapHeight(); y++) {
+            for (x = 0; x < game.getMapWidth(); x++) {
                 if(1 == map[i]) {
                     g2d.setColor(Color.blue);
-                    g2d.fillRect(x, y, squareSize,  squareSize);
-                } else if(2 == map[i]) {
-                    g2d.setColor(Color.yellow);
-                    //g2d.fillOval(x + (squareSize-dotSize)/2, y + (squareSize-dotSize)/2, dotSize, dotSize);
-                } else if(3 == map[i]) {
-                    g2d.setColor(Color.yellow);
-                    //g2d.fillOval(x + (squareSize-gumSize)/2, y + (squareSize-gumSize)/2, gumSize, gumSize);
+                    // Corners
+                    // Top-right
+                    if (1 == game.getSquare(x-1,y)
+                            && 0 == game.getSquare(x+1,y)
+                            && 0 == game.getSquare(x,y-1)
+                            && 1 == game.getSquare(x,y+1)) {
+                        g2d.drawLine(x*squareSize, y*squareSize + margin, (x+1)*squareSize - margin, y*squareSize + margin);
+                        g2d.drawLine((x + 1)*squareSize - margin, y*squareSize + margin, (x + 1)*squareSize - margin, (y+1)*squareSize);
+                        // Down-right
+                    } else if (1 == game.getSquare(x-1,y)
+                            && 0 == game.getSquare(x+1,y)
+                            && 1 == game.getSquare(x,y-1)
+                            && 0 == game.getSquare(x,y+1)) {
+                        g2d.drawLine(x*squareSize, (y+1)*squareSize - margin, (x+1)*squareSize - margin, (y+1)*squareSize - margin);
+                        g2d.drawLine((x + 1)*squareSize - margin, y*squareSize, (x + 1)*squareSize - margin, (y+1)*squareSize - margin);
+                        // Down-left
+                    } else if (0 == game.getSquare(x-1,y)
+                            && 1 == game.getSquare(x+1,y)
+                            && 1 == game.getSquare(x,y-1)
+                            && 0 == game.getSquare(x,y+1)) {
+                        g2d.drawLine(x*squareSize + margin, (y+1)*squareSize - margin, (x+1)*squareSize, (y+1)*squareSize - margin);
+                        g2d.drawLine(x*squareSize + margin, y*squareSize, x*squareSize + margin, (y+1)*squareSize - margin);
+                        // Top-left
+                    } else if (0 == game.getSquare(x-1,y)
+                            && 1 == game.getSquare(x+1,y)
+                            && 0 == game.getSquare(x,y-1)
+                            && 1 == game.getSquare(x,y+1)) {
+                        g2d.drawLine(x*squareSize + margin, y*squareSize + margin, (x+1)*squareSize, y*squareSize + margin);
+                        g2d.drawLine(x*squareSize + margin, y*squareSize + margin, x*squareSize + margin, (y+1)*squareSize);
+                        // Borders
+                        // Right
+                    } else if (1 == game.getSquare(x-1,y)
+                            && 0 == game.getSquare(x+1,y)
+                            && 1 == game.getSquare(x,y-1)
+                            && 1 == game.getSquare(x,y+1)) {
+                        g2d.drawLine((x + 1)*squareSize - margin, y*squareSize, (x + 1)*squareSize - margin, (y+1)*squareSize);
+                        // Left
+                    } else if (0 == game.getSquare(x-1,y)
+                            && 1 == game.getSquare(x+1,y)
+                            && 1 == game.getSquare(x,y-1)
+                            && 1 == game.getSquare(x,y+1)) {
+                        g2d.drawLine(x*squareSize + margin, y*squareSize, x*squareSize + margin, (y+1)*squareSize);
+                        // Up
+                    } else if (1 == game.getSquare(x-1,y)
+                            && 1 == game.getSquare(x+1,y)
+                            && 0 == game.getSquare(x,y-1)
+                            && 1 == game.getSquare(x,y+1)) {
+                        g2d.drawLine(x*squareSize, y*squareSize + margin, (x+1)*squareSize, y*squareSize + margin);
+                        // Down
+                    } else if (1 == game.getSquare(x-1,y)
+                            && 1 == game.getSquare(x+1,y)
+                            && 1 == game.getSquare(x,y-1)
+                            && 0 == game.getSquare(x,y+1)) {
+                        g2d.drawLine(x*squareSize, (y+1)*squareSize - margin, (x+1)*squareSize, (y+1)*squareSize - margin);
+                        // Inside corners
+                        // Top right
+                    } else if (1 == game.getSquare(x-1,y)
+                            && 1 == game.getSquare(x+1,y)
+                            && 1 == game.getSquare(x,y-1)
+                            && 1 == game.getSquare(x,y+1)
+                            && 0 == game.getSquare(x+1,y-1)) {
+                        g2d.drawLine((x+1)*squareSize - margin, (y)*squareSize + margin, (x+1)*squareSize, (y)*squareSize + margin);
+                        g2d.drawLine((x+1)*squareSize - margin, (y)*squareSize, (x+1)*squareSize - margin, (y)*squareSize + margin);
+                        // Down right
+                    } else if (1 == game.getSquare(x-1,y)
+                            && 1 == game.getSquare(x+1,y)
+                            && 1 == game.getSquare(x,y-1)
+                            && 1 == game.getSquare(x,y+1)
+                            && 0 == game.getSquare(x+1,y+1)) {
+                        g2d.drawLine((x+1)*squareSize - margin, (y+1)*squareSize - margin, (x+1)*squareSize, (y+1)*squareSize - margin);
+                        g2d.drawLine((x+1)*squareSize - margin, (y+1)*squareSize - margin, (x+1)*squareSize - margin, (y+1)*squareSize);
+                        // Down left
+                    } else if (1 == game.getSquare(x-1,y)
+                            && 1 == game.getSquare(x+1,y)
+                            && 1 == game.getSquare(x,y-1)
+                            && 1 == game.getSquare(x,y+1)
+                            && 0 == game.getSquare(x-1,y+1)) {
+                        g2d.drawLine(x*squareSize, (y+1)*squareSize - margin, x*squareSize + margin, (y+1)*squareSize - margin);
+                        g2d.drawLine(x*squareSize + margin, (y+1)*squareSize - margin, x*squareSize + margin, (y+1)*squareSize);
+                        // Up left
+                    } else if (1 == game.getSquare(x-1,y)
+                            && 1 == game.getSquare(x+1,y)
+                            && 1 == game.getSquare(x,y-1)
+                            && 1 == game.getSquare(x,y+1)
+                            && 0 == game.getSquare(x-1,y-1)) {
+                        g2d.drawLine(x*squareSize, y*squareSize + margin, x*squareSize + margin, y*squareSize + margin);
+                        g2d.drawLine(x*squareSize + margin, y*squareSize, x*squareSize + margin, y*squareSize + margin);
+                    } else {
+                        // black square => do nothing
+                    }
                 }
 
                 i++;
@@ -84,6 +167,7 @@ public class GameDisplay extends JPanel implements ActionListener {
         for(Player player : game.getPlayers()) {
             if (null != player) {
                 if (1 == player.getPower()) {
+                    // TODO: timeout animation
                     g2d.drawImage(superPacman, squareSize * player.getPosX() / Game.unitsPerSquare - margin,
                             squareSize * player.getPosY() / Game.unitsPerSquare - margin, this);
                 } else {

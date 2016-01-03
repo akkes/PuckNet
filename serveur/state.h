@@ -12,7 +12,7 @@
 #include "miulib.h"
 #include "player.h"
 
-#define DOTSNUMBER 80
+#define DOTSNUMBER 330
 #define WIDTH 28
 #define HEIGHT 31
 #define SQUARESIZE 15
