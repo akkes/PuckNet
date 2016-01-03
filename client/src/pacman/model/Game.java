@@ -73,6 +73,14 @@ public class Game {
         this.networkControler = networkControler;
     }
 
+    public int getSpawnX() {
+        return 2 * Game.unitsPerSquare;
+    }
+
+    public int getSpawnY() {
+        return 14 * Game.unitsPerSquare;
+    }
+
     public Player[] getPlayers() {
         return players;
     }

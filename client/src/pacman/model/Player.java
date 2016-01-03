@@ -19,8 +19,8 @@ public class Player {
     }
 
     public void reset() {
-        posX = 2 * Game.unitsPerSquare;
-        posY = 14 * Game.unitsPerSquare;
+        posX = game.getSpawnX();
+        posY = game.getSpawnY();
         movementX = 1;
         movementY = 0;
         nextDirection = -1;

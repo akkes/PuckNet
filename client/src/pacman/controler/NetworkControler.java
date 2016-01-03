@@ -158,6 +158,12 @@ public class NetworkControler {
                         game.setPlayer(new Integer(serverCommand[index+1]), null);
 
                         index += 2;
+                    } else if (serverCommand[index].matches("Eaten")) {
+                        int playerID = new Integer(serverCommand[index+1]);
+                        game.getPlayers()[playerID].setPosX(game.getSpawnX());
+                        game.getPlayers()[playerID].setPosY(game.getSpawnY());
+
+                        index += 2;
                     } else {
                         System.out.println("Erreur dans la commande du serveur: " + serverCommand[index]);
                         index ++;

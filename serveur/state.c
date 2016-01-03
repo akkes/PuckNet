@@ -233,6 +233,12 @@ String makeDeltaFromStates(State oldState, State newState) {
 				}
 				strcat(delta, temp);
 			}
+
+			printf("%d != %d\n", oldState->players[i]->posY, newState->players[i]->posY);
+			if (oldState->players[i]->lifes > newState->players[i]->lifes) {
+				sprintf(temp, " Eaten %d", (int) i);
+				strcat(delta, temp);
+			}
 		} else if (NULL != oldState->players[i] && NULL == newState->players[i]) {
 			DEBUG("    left");
 			sprintf(temp, " Leave %d", (int) i);
