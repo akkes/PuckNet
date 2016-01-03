@@ -49,6 +49,8 @@ typedef struct state_struct {
 
 //public
 State createInitialState();
+State addDotsAndGums(State);
+State createResetState(State);
 State createState(State, String*, int);
 State duplicateState(State);
 String makeDeltaFromStates(State, State);

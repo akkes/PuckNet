@@ -92,7 +92,7 @@ public class NetworkControler {
     }
 
     String receiveCommand() throws IOException {
-        byte[] buf = new byte[300];
+        byte[] buf = new byte[4*26+5*330];
         DatagramPacket packet = new DatagramPacket (buf, buf.length) ;
         socket.receive (packet);
 
@@ -164,6 +164,14 @@ public class NetworkControler {
                         game.getPlayers()[playerID].setPosY(game.getSpawnY());
 
                         index += 2;
+                    } else if (serverCommand[index].matches("NewDot")) {
+                        int dotID = new Integer(serverCommand[index+1]);
+                        game.addNewDot(dotID);
+                        index += 2;
+                    } else if (serverCommand[index].matches("NewGum")) {
+                        int gumID = new Integer(serverCommand[index+1]);
+                        game.addNewGum(gumID);
+                        index += 2;
                     } else {
                         System.out.println("Erreur dans la commande du serveur: " + serverCommand[index]);
                         index ++;
@@ -220,6 +228,10 @@ public class NetworkControler {
 
     public void setplayerEated(int playerID) {
         eatenPlayersList.add(playerID);
+    }
+
+    public void reset() {
+        sendCommand("RESET");
     }
 
     public void closeConnexion() {

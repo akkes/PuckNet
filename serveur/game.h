@@ -6,6 +6,7 @@
 #ifndef GAME
 #define GAME
 
+#include <time.h>
 #include "miulib.h"
 #include "netlib.h"
 #include "player.h"

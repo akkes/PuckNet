@@ -137,7 +137,7 @@ void disconnectPlayers(Game game) {
 	DEBUG("disconnectPlayers");
 	for (size_t i = 0; i < PLAYERSMAX; i++) {
 		if (NULL != game->players[i]) {
-			if(game->players[i]->lastACK + STATESCONSERVED < game->state) {
+			if(difftime(time(NULL), game->players[i]->lastACKTime) > 10) {
 				freePlayer(game->players[i]);
 				State newState = duplicateState(getLastState(game));
 				newState->id++;

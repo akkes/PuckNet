@@ -119,6 +119,14 @@ Boolean isAckCommand(Command command){
 	return false;
 }
 
+Boolean isResetCommand(Command command){
+	DEBUG("Test RESET Command");
+	if (0 == strcmp(command->content[0], "RESET")) {
+		return true;
+	}
+	return false;
+}
+
 //interpretation
 void interpretJoiningCommand(Command command, Game game, ListeningPort connection){
 	DEBUG("interpretJoiningCommand");
@@ -135,6 +143,8 @@ void interpretGameCommand(Command command, Game game, ListeningPort connection){
 	DEBUG("interpretGameCommand");
 	if (isAckCommand(command)) {
 		interpretAck(command, game, connection);
+	} else if (isResetCommand(command)) {
+		interpretReset(command, game, connection);
 	} else if (isJoinCommand(command)) {
 		interpretReJoin(command, game, connection);
 	} else {
@@ -193,6 +203,7 @@ void interpretAck(Command command, Game game, ListeningPort connection){
 	int newLastACK = atoi(command->content[1]);
 	if (newLastACK > 0) {
 		game->players[playerID]->lastACK = newLastACK;
+		game->players[playerID]->lastACKTime = time(NULL);
 	}
 
 	// create new State
@@ -205,6 +216,11 @@ void interpretAck(Command command, Game game, ListeningPort connection){
 
 	// send delta
 	sendDelta(connection, command->source, oldState, newState, getLastStateID(game));
+}
+
+void interpretReset(Command command, Game game, ListeningPort connection){
+	DEBUG("interpret Where");
+	addState(game, createResetState(getLastState(game)));
 }
 
 //send commands

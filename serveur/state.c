@@ -5,19 +5,39 @@ State createInitialState() {
 	State initialState = malloc(sizeof(struct state_struct));
 	bzero(initialState, sizeof(struct state_struct));
 
-	// add dots
-	for (size_t i = 0; i < DOTSNUMBER; i++) {
-		initialState->dots[i] = createDot(20, 20);
-	}
-
-	// add gums
-	for (size_t i = 0; i < PLAYERSMAX; i++) {
-		initialState->gums[i] = createGum(4, 4);
-	}
+	addDotsAndGums(initialState);
 
 	initialState->id = 0;
 
 	return initialState;
+}
+
+State createResetState(State oldState) {
+	State resetState = duplicateState(oldState);
+
+	addDotsAndGums(resetState);
+
+	return resetState;
+}
+
+State addDotsAndGums(State state) {
+	// add dots
+	for (size_t i = 0; i < DOTSNUMBER; i++) {
+		if (NULL != state->dots[i]) {
+			free(state->dots[i]);
+		}
+		state->dots[i] = createDot(20, 20);
+	}
+
+	// add gums
+	for (size_t i = 0; i < PLAYERSMAX; i++) {
+		if (NULL != state->gums[i]) {
+			free(state->gums[i]);
+		}
+		state->gums[i] = createGum(4, 4);
+	}
+
+	return state;
 }
 
 Dot createDot(int x, int y) {
@@ -189,7 +209,7 @@ Player removePlayerFromState(State state, int playerID) {
 
 String makeDeltaFromStates(State oldState, State newState) {
 	DEBUG("makeDeltaFromStates");
-	String delta = malloc(256 * sizeof(char));
+	String delta = malloc((4*26+5*DOTSNUMBER) * sizeof(char));
 	bzero(delta, 256 * sizeof(char));
 
 	String temp = malloc(20 * sizeof(char));
@@ -254,6 +274,10 @@ String makeDeltaFromStates(State oldState, State newState) {
 			sprintf(temp, " Gum %d",
 				(int) i);
 			strcat(delta, temp);
+		} else if (NULL != newState->gums[i] && NULL == oldState->gums[i]){
+			sprintf(temp, " NewGum %d",
+				(int) i);
+			strcat(delta, temp);
 		}
 	}
 
@@ -261,6 +285,10 @@ String makeDeltaFromStates(State oldState, State newState) {
 	for (size_t i = 0; i < DOTSNUMBER; i++) {
 		if (NULL == newState->dots[i] && NULL != oldState->dots[i]) {
 			sprintf(temp, " Dot %d",
+				(int) i);
+			strcat(delta, temp);
+		} else if (NULL != newState->dots[i] && NULL == oldState->dots[i]){
+			sprintf(temp, " NewDot %d",
 				(int) i);
 			strcat(delta, temp);
 		}

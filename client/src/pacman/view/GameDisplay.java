@@ -50,6 +50,7 @@ public class GameDisplay extends JPanel implements ActionListener {
             for (x = 0; x < game.getMapWidth(); x++) {
                 if(1 == map[i]) {
                     g2d.setColor(Color.blue);
+                    g2d.setStroke(new BasicStroke(2));
                     // Corners
                     // Top-right
                     if (1 == game.getSquare(x-1,y)

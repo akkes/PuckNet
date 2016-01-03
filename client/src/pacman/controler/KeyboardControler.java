@@ -12,10 +12,12 @@ import java.awt.event.KeyEvent;
  */
 public class KeyboardControler extends KeyAdapter {
 
-    Game game;
+    private Game game;
+    private NetworkControler networkControler;
 
-    public KeyboardControler(Game game) {
+    public KeyboardControler(Game game, NetworkControler networkControler) {
         this.game = game;
+        this.networkControler = networkControler;
     }
 
     public void keyPressed(KeyEvent e) { //on indique a quoi servent les touches du clavier
@@ -31,8 +33,7 @@ public class KeyboardControler extends KeyAdapter {
         } else if (key == KeyEvent.VK_DOWN) {
             game.getPlayers()[game.getLocalPlayerID()].setDirection(2);
         } else if (key == KeyEvent.VK_R) {
-            // en vrai on l'enleverai, mais on est pas en vrai
-            game.getPlayers()[game.getLocalPlayerID()].reset();
+            networkControler.reset();
         }
 
     }

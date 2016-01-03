@@ -7,6 +7,7 @@
 #define PLAYER
 
 #include <sys/socket.h>
+#include <time.h>
 #include "netlib.h"
 #include "miulib.h"
 
@@ -20,6 +21,7 @@ typedef struct player_struct{
 	int spawnY;
 	int lifes;
 	int lastACK;
+	time_t lastACKTime;
 }* Player;
 
 void sendToPlayer(ListeningPort, Player, String);

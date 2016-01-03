@@ -28,6 +28,7 @@ Player createPlayer(String name, Color color, struct sockaddr_in addr, int lastA
 	newPlayer->spawnX = 14 * 15;
 	newPlayer->spawnY = 17 * 15;
 	newPlayer->lastACK = lastACK;
+	newPlayer->lastACKTime = time(NULL);
 
 	return newPlayer;
 }

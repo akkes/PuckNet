@@ -28,7 +28,7 @@ public class PuckNet extends JFrame {
 
         // créer fenêtre
         GameDisplay gameDisplay = new GameDisplay(game);
-        gameDisplay.addKeyListener(new KeyboardControler(game));
+        gameDisplay.addKeyListener(new KeyboardControler(game, networkControler));
         add(gameDisplay);
         setTitle("PuckNet");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

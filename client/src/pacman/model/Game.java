@@ -381,6 +381,14 @@ public class Game {
         gumsList = originalGumsList.clone();
     }
 
+    public void addNewDot(int id) {
+        dotsList[id] = originalDotsList[id];
+    }
+
+    public void addNewGum(int id) {
+        gumsList[id] = originalGumsList[id];
+    }
+
     public void setNetworkControler(NetworkControler networkControler) {
         this.networkControler = networkControler;
     }
