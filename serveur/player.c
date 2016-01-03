@@ -9,7 +9,7 @@ void sendToPlayer(ListeningPort connection, Player player, String message){
 	sendMessage(connection, player->addr, message);
 }
 
-Player createPlayer(String name, Color color, struct sockaddr_in addr){
+Player createPlayer(String name, Color color, struct sockaddr_in addr, int lastACK){
 	Player newPlayer;
 	puts("createPlayer");
 
@@ -27,7 +27,7 @@ Player createPlayer(String name, Color color, struct sockaddr_in addr){
 	newPlayer->lifes = 1;
 	newPlayer->spawnX = 2 * 15;
 	newPlayer->spawnY = 14 * 15;
-	newPlayer->lastACK = 0;
+	newPlayer->lastACK = lastACK;
 
 	return newPlayer;
 }

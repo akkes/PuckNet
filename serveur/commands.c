@@ -153,7 +153,7 @@ void interpretJoin(Command command, Game game, ListeningPort connection){
 
 	if (game->numberOfPlayers < PLAYERSMAX) {
 		// create player
-		playerNumber = addPlayer(game, createPlayer(command->content[1], command->content[2], command->source));
+		playerNumber = addPlayer(game, createPlayer(command->content[1], command->content[2], command->source, getLastStateID(game)));
 
 		// create state
 		State oldState = duplicateState(getLastState(game));
@@ -190,7 +190,10 @@ void interpretAck(Command command, Game game, ListeningPort connection){
 	int playerID = findPlayerID(game, command->source);
 
 	// change lastACK heard of
-	game->players[playerID]->lastACK = atoi(command->content[1]);
+	int newLastACK = atoi(command->content[1]);
+	if (newLastACK > 0) {
+		game->players[playerID]->lastACK = newLastACK;
+	}
 
 	// create new State
 	State newState = createState(getLastState(game), command->content+2, playerID);

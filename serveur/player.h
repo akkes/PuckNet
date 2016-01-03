@@ -23,7 +23,7 @@ typedef struct player_struct{
 }* Player;
 
 void sendToPlayer(ListeningPort, Player, String);
-Player createPlayer(String, Color, struct sockaddr_in);
+Player createPlayer(String, Color, struct sockaddr_in, int);
 String getPlayerName(Player);
 Color getPlayerColor(Player);
 struct sockaddr_in getPlayerHost(Player);
