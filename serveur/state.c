@@ -235,7 +235,8 @@ String makeDeltaFromStates(State oldState, State newState) {
 			}
 		} else if (NULL != oldState->players[i] && NULL == newState->players[i]) {
 			DEBUG("    eaten");
-			// TODO: eaten
+			sprintf(temp, " Leave %d", (int) i);
+			strcat(delta, temp);
 		} else {
 			DEBUG("    still dead");
 		}

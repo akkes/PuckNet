@@ -37,6 +37,9 @@ int main ()
                 free(message);
                 freeCommand(command);
 
+		// Disconnect players
+		disconnectPlayers(game);
+
                 //Si on a fini
                 // //quit = 1;
         } while (0 == quit);

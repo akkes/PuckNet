@@ -189,6 +189,9 @@ void interpretAck(Command command, Game game, ListeningPort connection){
 	//find player number
 	int playerID = findPlayerID(game, command->source);
 
+	// change lastACK heard of
+	game->players[playerID]->lastACK = atoi(command->content[1]);
+
 	// create new State
 	State newState = createState(getLastState(game), command->content+2, playerID);
 	addState(game, newState);

@@ -154,6 +154,10 @@ public class NetworkControler {
                         game.getPlayers()[new Integer(serverCommand[index+1])].setPower(0);
 
                         index += 2;
+                    } else if (serverCommand[index].matches("Leave")) {
+                        game.setPlayer(new Integer(serverCommand[index+1]), null);
+
+                        index += 2;
                     } else {
                         System.out.println("Erreur dans la commande du serveur: " + serverCommand[index]);
                         index ++;

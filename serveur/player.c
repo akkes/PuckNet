@@ -52,7 +52,7 @@ struct sockaddr_in getPlayerHost(Player player){
 }
 
 void freePlayer(Player player){
-	puts("freePlayer");
+	printf("freePlayer: %s\n", player->name);
 
 	//free content
 	free(player->name);

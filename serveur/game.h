@@ -36,5 +36,6 @@ Player getPlayer(Game, int);
 State addState(Game, State);
 State getState(Game, int);
 State getLastState(Game);
+void disconnectPlayers(Game);
 
 #endif
