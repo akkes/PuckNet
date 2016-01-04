@@ -382,11 +382,15 @@ public class Game {
     }
 
     public void addNewDot(int id) {
-        dotsList[id] = originalDotsList[id];
+        if (0 < id && id < dotsList.length) {
+            dotsList[id] = originalDotsList[id];
+        }
     }
 
     public void addNewGum(int id) {
-        gumsList[id] = originalGumsList[id];
+        if (0 < id && id < gumsList.length) {
+            gumsList[id] = originalGumsList[id];
+        }
     }
 
     public void setNetworkControler(NetworkControler networkControler) {

@@ -24,12 +24,15 @@ public class NetworkControler {
     private ArrayList<Integer> eatenGumsList = new ArrayList<>();
     private ArrayList<Integer> eatenPlayersList = new ArrayList<>();
     private Boolean connected;
+    private int lostPackets;
+    private Timer timer;
 
     public NetworkControler(Game game, String address, int port) {
         this.game = game;
         // Create needed tools
         try {
-            this.socket = new DatagramSocket () ;
+            this.socket = new DatagramSocket();
+            this.socket.setSoTimeout(1000/60);
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -40,6 +43,7 @@ public class NetworkControler {
         }
         this.port = port;
         this.lastReceivedState = 0;
+        this.lostPackets = 0;
 
         // Connect
         sendCommand("JOIN Akkes FF0000");
@@ -66,7 +70,7 @@ public class NetworkControler {
         sendCommand("ACK 0");
 
         // timer to sync with serveur
-        Timer timer = new Timer();
+        this.timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -97,7 +101,7 @@ public class NetworkControler {
         socket.receive (packet);
 
         // Affiche la reponse
-        String received = new String (packet.getData ()) ;
+        String received = new String (packet.getData()) ;
         System.out.println ("<- " + received) ;
         return received;
     }
@@ -106,6 +110,7 @@ public class NetworkControler {
         String serverAnswer = null;
         try {
             serverAnswer = receiveCommand();
+            this.lostPackets = 0;
             String[] serverCommand = serverAnswer.split("[ |\u0000]+");
 
             // Interpret Delta
@@ -183,8 +188,13 @@ public class NetworkControler {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Le serveur est déconnecté");
+            this.lostPackets++;
+
+            if (lostPackets > 30*10) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Le serveur est déconnecté");
+                System.exit(0);
+            }
         }
 
         // Send State
@@ -234,6 +244,9 @@ public class NetworkControler {
     }
 
     public void closeConnexion() {
+        timer.cancel();
+        sendCommand("LEAVE");
+
         socket.close ();
     }
 }

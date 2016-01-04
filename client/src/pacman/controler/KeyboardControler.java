@@ -34,6 +34,9 @@ public class KeyboardControler extends KeyAdapter {
             game.getPlayers()[game.getLocalPlayerID()].setDirection(2);
         } else if (key == KeyEvent.VK_R) {
             networkControler.reset();
+        } else if (key == KeyEvent.VK_CANCEL || key == KeyEvent.VK_Q) {
+            networkControler.closeConnexion();
+            System.exit(0);
         }
 
     }

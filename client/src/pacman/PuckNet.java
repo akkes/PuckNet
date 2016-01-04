@@ -7,8 +7,10 @@ import pacman.view.GameDisplay;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 
 public class PuckNet extends JFrame {
+    private NetworkControler networkControler;
 
     public PuckNet() {
 
@@ -20,7 +22,7 @@ public class PuckNet extends JFrame {
 
         // connection
         String serverAddress = (String)JOptionPane.showInputDialog(this, "Entrez l'adresse du serveur");
-        NetworkControler networkControler = new NetworkControler(game, serverAddress, 7825);
+        this.networkControler = new NetworkControler(game, serverAddress, 7825);
         game.setNetworkControler(networkControler);
         if (!networkControler.isConnected()) {
             System.exit(0);
@@ -40,8 +42,18 @@ public class PuckNet extends JFrame {
 
         // Jouer
     }
-    
-   
+
+    @Override
+    protected void processWindowEvent(WindowEvent e) {
+        if(e.getID() == WindowEvent.WINDOW_CLOSING){
+
+            networkControler.closeConnexion();
+
+        }
+
+        super.processWindowEvent(e);
+    }
+
     public static void main(String[] args) {
     	new PuckNet();
     }
