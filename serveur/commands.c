@@ -105,7 +105,9 @@ Boolean isWhereCommand(Command command){
 
 Boolean isJoinCommand(Command command){
 	DEBUG("Test JOIN Command");
-	if (0 == strcmp(command->content[0], "JOIN")) {
+	if (0 == strcmp(command->content[0], "JOIN")
+		&& NULL != command->content[1]
+		&& NULL != command->content[2]) {
 		return true;
 	}
 	return false;
@@ -113,7 +115,8 @@ Boolean isJoinCommand(Command command){
 
 Boolean isAckCommand(Command command){
 	DEBUG("Test ACK Command");
-	if (0 == strcmp(command->content[0], "ACK")) {
+	if (0 == strcmp(command->content[0], "ACK")
+		&& NULL != command->content[1]) {
 		return true;
 	}
 	return false;
@@ -122,6 +125,14 @@ Boolean isAckCommand(Command command){
 Boolean isResetCommand(Command command){
 	DEBUG("Test RESET Command");
 	if (0 == strcmp(command->content[0], "RESET")) {
+		return true;
+	}
+	return false;
+}
+
+Boolean isLeaveCommand(Command command){
+	DEBUG("Test LEAVE Command");
+	if (0 == strcmp(command->content[0], "LEAVE")) {
 		return true;
 	}
 	return false;
@@ -145,6 +156,8 @@ void interpretGameCommand(Command command, Game game, ListeningPort connection){
 		interpretAck(command, game, connection);
 	} else if (isResetCommand(command)) {
 		interpretReset(command, game, connection);
+	} else if (isLeaveCommand(command)) {
+		interpretLeave(command, game, connection);
 	} else if (isJoinCommand(command)) {
 		interpretReJoin(command, game, connection);
 	} else {
@@ -212,16 +225,25 @@ void interpretAck(Command command, Game game, ListeningPort connection){
 
 		// get Old State
 		printf("atoi(%s) -> %d\n", command->content[1], atoi(command->content[1]));
+		// TODO: we add -1 because of a weird bug we don't have time to debug.
 		State oldState = getState(game, atoi(command->content[1]) -1);
 
 		// send delta
 		sendDelta(connection, command->source, oldState, newState, getLastStateID(game));
 	}
+	puts("fin interpretAck");
 }
 
 void interpretReset(Command command, Game game, ListeningPort connection){
-	DEBUG("interpret Where");
+	DEBUG("interpret Reset");
 	addState(game, createResetState(getLastState(game)));
+}
+
+void interpretLeave(Command command, Game game, ListeningPort connection){
+	DEBUG("interpret Leave");
+	int playerID = findPlayerID(game, command->source);
+
+	disconnectPlayer(game, playerID);
 }
 
 //send commands
@@ -246,5 +268,7 @@ void sendDelta(ListeningPort connection, struct sockaddr_in addr, State oldState
 	strcat(delta, makeDeltaFromStates(oldState, newState));
 
 	sendMessage(connection, addr, delta);
+
+	puts ("find sendDelta");
 	return;
 }

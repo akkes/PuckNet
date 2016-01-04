@@ -31,6 +31,7 @@ Boolean isWhereCommand(Command command);
 Boolean isJoinCommand(Command command);
 Boolean isAckCommand(Command command);
 Boolean isResetCommand(Command command);
+Boolean isLeaveCommand(Command command);
 Boolean isTurnedCommand(Command command);
 Boolean isSuperCommand(Command command);
 Boolean isEatenCommand(Command command);
@@ -42,6 +43,7 @@ void interpretWhere(Command, Game, ListeningPort);
 void interpretJoin(Command, Game, ListeningPort);
 void interpretReJoin(Command, Game, ListeningPort);
 void interpretReset(Command, Game, ListeningPort);
+void interpretLeave(Command, Game, ListeningPort);
 void interpretAck(Command, Game, ListeningPort);
 
 //send Command commands

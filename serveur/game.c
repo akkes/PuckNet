@@ -133,18 +133,24 @@ int findPlayerID(Game game, struct sockaddr_in addr) {
         return -1;
 }
 
+void disconnectPlayer(Game game, int i) {
+	DEBUG("disconnectPlayer");
+	printf("disconnectPlayer ID: %d\n", i);
+	freePlayer(game->players[i]);
+	State newState = duplicateState(getLastState(game));
+	newState->id++;
+	removePlayerFromState(newState, i);
+	addState(game, newState);
+	game->players[i] = NULL;
+	game->numberOfPlayers--;
+}
+
 void disconnectPlayers(Game game) {
 	DEBUG("disconnectPlayers");
 	for (size_t i = 0; i < PLAYERSMAX; i++) {
 		if (NULL != game->players[i]) {
 			if(difftime(time(NULL), game->players[i]->lastACKTime) > 10) {
-				freePlayer(game->players[i]);
-				State newState = duplicateState(getLastState(game));
-				newState->id++;
-				removePlayerFromState(newState, i);
-				addState(game, newState);
-				game->players[i] = NULL;
-				game->numberOfPlayers--;
+				disconnectPlayer(game, i);
 			}
 		}
 	}

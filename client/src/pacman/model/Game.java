@@ -382,13 +382,13 @@ public class Game {
     }
 
     public void addNewDot(int id) {
-        if (0 < id && id < dotsList.length) {
+        if (0 <= id && id < dotsList.length) {
             dotsList[id] = originalDotsList[id];
         }
     }
 
     public void addNewGum(int id) {
-        if (0 < id && id < gumsList.length) {
+        if (0 <= id && id < gumsList.length) {
             gumsList[id] = originalGumsList[id];
         }
     }
@@ -491,6 +491,8 @@ public class Game {
                     && players[i].getPosX()/unitsPerSquare == eaten.x
                     && players[i].getPosY()/unitsPerSquare == eaten.y) {
                 networkControler.setplayerEated(i);
+                players[i].setPosX(getSpawnX());
+                players[i].setPosY(getSpawnY());
             }
         }
 

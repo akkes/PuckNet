@@ -5,6 +5,8 @@ package pacman.model;
  */
 
 public class Player {
+    protected int oldX;
+    protected int oldY;
     protected int posX;
     protected int posY;
     private int movementX;
@@ -12,6 +14,7 @@ public class Player {
     private int nextDirection;
     private int power;
     private int powerTime;
+    private int score;
     protected Game game;
 
     public Player(Game game) {
@@ -27,6 +30,23 @@ public class Player {
         nextDirection = -1;
         power = 0;
         powerTime = 0;
+        score = 0;
+    }
+
+    public void resetScore() {
+        score = 0;
+    }
+
+    public void addScore(int n) {
+        score += n;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public int getPosX() {
@@ -37,11 +57,30 @@ public class Player {
         return posY;
     }
 
+    public int getDirection() {
+        int diffX = posX - oldX;
+        int diffY = posY - oldY;
+
+        if (diffY > 0) {
+            return 2;
+        } else if (diffY < 0){
+            return 0;
+        } else if (diffX > 0) {
+            return 1;
+        } else {
+            return 3;
+        }
+    }
+
     public void setPosX(int posX) {
+        this.oldY = this.posY;
+        this.oldX = this.posX;
         this.posX = posX;
     }
 
     public void setPosY(int posY) {
+        this.oldX = this.posX;
+        this.oldY = this.posY;
         this.posY = posY;
     }
 
@@ -114,12 +153,12 @@ public class Player {
         if (1 == movementX) {
             if (1 != game.getUnit(newX + Game.unitsPerSquare-1, newY)
                     && 1 != game.getUnit(newX + Game.unitsPerSquare-1, newY + Game.unitsPerSquare-1)) {
-                posX = newX;
+                setPosX(newX);
             }
         } else if (-1 == movementX) {
             if (1 != game.getUnit(newX, newY)
                     && 1 != game.getUnit(newX, newY + Game.unitsPerSquare-1)) {
-                posX = newX;
+                setPosX(newX);
             }
         }
 
@@ -127,12 +166,12 @@ public class Player {
         if (1 == movementY) {
             if (1 != game.getUnit(newX, newY + Game.unitsPerSquare-1)
                     && 1 != game.getUnit(newX + Game.unitsPerSquare-1, newY + Game.unitsPerSquare-1)) {
-                posY = newY;
+                setPosY(newY);
             }
         } else if (-1 == movementY) {
             if (1 != game.getUnit(newX, newY)
                     && 1 != game.getUnit(newX + Game.unitsPerSquare-1, newY)) {
-                posY = newY;
+                setPosY(newY);
             }
         }
 

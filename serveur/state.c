@@ -5,7 +5,21 @@ State createInitialState() {
 	State initialState = malloc(sizeof(struct state_struct));
 	bzero(initialState, sizeof(struct state_struct));
 
-	addDotsAndGums(initialState);
+	// add dots
+	initialState->originalDot = createDot(20, 20);
+	for (size_t i = 0; i < DOTSNUMBER; i++) {
+		if (NULL == initialState->dots[i]) {
+			initialState->dots[i] = initialState->originalDot;
+		}
+	}
+
+	// add gums
+	initialState->originalGum = createGum(4, 4);
+	for (size_t i = 0; i < PLAYERSMAX; i++) {
+		if (NULL == initialState->gums[i]) {
+			initialState->gums[i] = initialState->originalGum;
+		}
+	}
 
 	initialState->id = 0;
 
@@ -17,25 +31,17 @@ State createResetState(State oldState) {
 
 	addDotsAndGums(resetState);
 
+	// reset scores
+	for (size_t i = 0; i < PLAYERSMAX; i++) {
+		if (NULL != resetState->players[i]) {
+			resetState->players[i]->score = 0;
+		}
+	}
+
 	return resetState;
 }
 
 State addDotsAndGums(State state) {
-	// add dots
-	for (size_t i = 0; i < DOTSNUMBER; i++) {
-		if (NULL != state->dots[i]) {
-			free(state->dots[i]);
-		}
-		state->dots[i] = createDot(20, 20);
-	}
-
-	// add gums
-	for (size_t i = 0; i < PLAYERSMAX; i++) {
-		if (NULL != state->gums[i]) {
-			free(state->gums[i]);
-		}
-		state->gums[i] = createGum(4, 4);
-	}
 
 	return state;
 }
@@ -67,6 +73,8 @@ PlayerState createPlayerState(Player player) {
 	playerState->lifes = player->lifes;
 	playerState->power = 0;
 	playerState->powerTime = time(NULL);
+	playerState->score = 0;
+	playerState->streak = 0;
 	return playerState;
 }
 
@@ -83,6 +91,8 @@ PlayerState duplicatePlayerState(PlayerState oldPlayerState) {
 		newPlayerState->lifes = oldPlayerState->lifes;
 		newPlayerState->power = oldPlayerState->power;
 		newPlayerState->powerTime = oldPlayerState->powerTime;
+		newPlayerState->score = oldPlayerState->score;
+		newPlayerState->streak = oldPlayerState->streak;
 	}
 
 	return newPlayerState;
@@ -129,49 +139,52 @@ State createState(State oldState, String* command, int player) {
 			printf("%ld - %ld = %lf\n", now, newState->players[i]->powerTime, difftime(now, newState->players[i]->powerTime));
 			if (difftime(now, newState->players[i]->powerTime) > 10) {
 				newState->players[i]->power = 0;
+				newState->players[i]->streak = 0;
 			}
 		}
 	}
 
 	// parse new events
 	printf("    newStateID: %d\n", newState->id);
-	int placeHolder, index = 0;
+	int index = 0;
 	while (NULL != command[index]) {
-		if (0 == strcmp(command[index], "X")) {
+		if (0 == strcmp(command[index], "X")
+				&& NULL != command[index+1]) {
 			printf("    X");
 			newState->players[player]->posX = atoi(command[index+1]);
 			printf(" %d\n", newState->players[player]->posX);
 			index++;
-		} else if (0 == strcmp(command[index], "Y")) {
+		} else if (0 == strcmp(command[index], "Y")
+				&& NULL != command[index+1]) {
 			printf("    Y");
 			newState->players[player]->posY = atoi(command[index+1]);
 			printf(" %d\n", newState->players[player]->posY);
 			index++;
-		} else if (0 == strcmp(command[index], "Dot")) {
+		} else if (0 == strcmp(command[index], "Dot")
+				&& NULL != command[index+1]) {
 			printf("    Dot");
+			newState->players[player]->score += 10;
 			newState->dots[atoi(command[index+1])] = NULL;
 			index++;
-		} else if (0 == strcmp(command[index], "Gum")) {
+		} else if (0 == strcmp(command[index], "Gum")
+				&& NULL != command[index+1]) {
 			printf("    Gum");
+			newState->players[player]->score += 50;
+			newState->players[player]->streak = 0;
 			newState->gums[atoi(command[index+1])] = NULL;
 			newState->players[player]->power = 1;
 			newState->players[player]->powerTime = time(NULL);
 			index++;
-		} else if (0 == strcmp(command[index], "Eat")) {
+		} else if (0 == strcmp(command[index], "Eat")
+				&& NULL != command[index+1]) {
 			printf("    Eat");
-			placeHolder = atoi(command[index+1]);
+			newState->players[player]->streak++;
+			newState->players[player]->score += newState->players[player]->streak * 200 + 200;
 			newState->players[atoi(command[index+1])]->lifes--;
 			newState->players[atoi(command[index+1])]->posX = 2*15;
 			newState->players[atoi(command[index+1])]->posY = 14*15;
-			printf(" %d\n", placeHolder);
-			index++;
-		} else if (0 == strcmp(command[index], "Score")) {
-			printf("    Score");
-			placeHolder = atoi(command[index+1]);
-			printf(" %d\n", placeHolder);
 			index++;
 		} else {
-			placeHolder = -1;
 			DEBUG("    Erreur dans la validation");
 			printf("    %s\n", command[index]);
 		}
@@ -209,8 +222,8 @@ Player removePlayerFromState(State state, int playerID) {
 
 String makeDeltaFromStates(State oldState, State newState) {
 	DEBUG("makeDeltaFromStates");
-	String delta = malloc((4*26+5*DOTSNUMBER) * sizeof(char));
-	bzero(delta, 256 * sizeof(char));
+	String delta = malloc(4000 * sizeof(char));
+	bzero(delta, 4000 * sizeof(char));
 
 	String temp = malloc(20 * sizeof(char));
 	bzero(temp, 20 * sizeof(char));
@@ -257,6 +270,13 @@ String makeDeltaFromStates(State oldState, State newState) {
 			printf("%d != %d\n", oldState->players[i]->posY, newState->players[i]->posY);
 			if (oldState->players[i]->lifes > newState->players[i]->lifes) {
 				sprintf(temp, " Eaten %d", (int) i);
+				strcat(delta, temp);
+			}
+
+			printf("%d != %d\n", oldState->players[i]->score, newState->players[i]->score);
+			if (oldState->players[i]->score != newState->players[i]->score) {
+				sprintf(temp, " Score %d %d",
+					(int) i, newState->players[i]->score);
 				strcat(delta, temp);
 			}
 		} else if (NULL != oldState->players[i] && NULL == newState->players[i]) {

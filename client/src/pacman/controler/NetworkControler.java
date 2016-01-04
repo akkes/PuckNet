@@ -32,9 +32,10 @@ public class NetworkControler {
         // Create needed tools
         try {
             this.socket = new DatagramSocket();
-            this.socket.setSoTimeout(1000/60);
+            this.socket.setSoTimeout(3000);
         } catch (SocketException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Impossible de se connecter au serveur. :-(");
+            System.exit(0);
         }
         try {
             this.ip = InetAddress.getByName (address);
@@ -54,7 +55,7 @@ public class NetworkControler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String[] commandContent = serverAnswer.split("[ |\u0000]+");
+        String[] commandContent = serverAnswer.split("[ |\u0000|\n]+");
 
         // define local playerID
         if (commandContent[0].matches("ACCEPT")) {
@@ -68,6 +69,12 @@ public class NetworkControler {
 
         // send first ACK to start communication
         sendCommand("ACK 0");
+
+        try {
+            this.socket.setSoTimeout(1000/30);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
 
         // timer to sync with serveur
         this.timer = new Timer();
@@ -84,7 +91,6 @@ public class NetworkControler {
     }
 
     void sendCommand(String command){
-        //TODO: code de la prof, faire la classe en vrai
         byte[] buf = command.getBytes() ;
         DatagramPacket packet = new DatagramPacket(buf, buf.length, ip, port);
         System.out.println ("-> " + command) ;
@@ -96,7 +102,7 @@ public class NetworkControler {
     }
 
     String receiveCommand() throws IOException {
-        byte[] buf = new byte[4*26+5*330];
+        byte[] buf = new byte[4000];
         DatagramPacket packet = new DatagramPacket (buf, buf.length) ;
         socket.receive (packet);
 
@@ -111,7 +117,7 @@ public class NetworkControler {
         try {
             serverAnswer = receiveCommand();
             this.lostPackets = 0;
-            String[] serverCommand = serverAnswer.split("[ |\u0000]+");
+            String[] serverCommand = serverAnswer.split("[ |\u0000|\n]+");
 
             // Interpret Delta
             if (serverCommand[0].matches("DELTA")) {
@@ -121,7 +127,8 @@ public class NetworkControler {
                     this.lastReceivedState = receivedState;
 
                     while (index < serverCommand.length) {
-                        if (serverCommand[index].matches("X")) {
+                        if (serverCommand[index].matches("X")
+                                && serverCommand.length >= index+2) {
                             int playerID = new Integer(serverCommand[index + 1]);
                             int posX = new Integer(serverCommand[index + 2]);
                             if (playerID != game.getLocalPlayerID()) {
@@ -129,7 +136,8 @@ public class NetworkControler {
                             }
 
                             index += 3;
-                        } else if (serverCommand[index].matches("Y")) {
+                        } else if (serverCommand[index].matches("Y")
+                                && serverCommand.length >= index+2) {
                             int playerID = new Integer(serverCommand[index + 1]);
                             int posY = new Integer(serverCommand[index + 2]);
                             if (playerID != game.getLocalPlayerID()) {
@@ -137,7 +145,15 @@ public class NetworkControler {
                             }
 
                             index += 3;
-                        } else if (serverCommand[index].matches("NewPlayer")) {
+                        } else if (serverCommand[index].matches("Score")
+                                && serverCommand.length >= index+2) {
+                            int playerID = new Integer(serverCommand[index + 1]);
+                            int score = new Integer(serverCommand[index + 2]);
+                            game.getPlayers()[playerID].setScore(score);
+
+                            index += 3;
+                        } else if (serverCommand[index].matches("NewPlayer")
+                                && serverCommand.length >= index+3) {
                             int playerID = new Integer(serverCommand[index + 1]);
                             int posX = new Integer(serverCommand[index + 2]);
                             int posY = new Integer(serverCommand[index + 3]);
@@ -146,37 +162,45 @@ public class NetworkControler {
                             game.getPlayers()[playerID].setPosY(posY);
 
                             index += 6;
-                        } else if (serverCommand[index].matches("Dot")) {
+                        } else if (serverCommand[index].matches("Dot")
+                                && serverCommand.length >= index+1) {
                             game.setDotEated(new Integer(serverCommand[index + 1]));
 
                             index += 2;
-                        } else if (serverCommand[index].matches("Gum")) {
+                        } else if (serverCommand[index].matches("Gum")
+                                && serverCommand.length >= index+1) {
                             game.setGumEated(new Integer(serverCommand[index + 1]));
 
                             index += 2;
-                        } else if (serverCommand[index].matches("Super")) {
+                        } else if (serverCommand[index].matches("Super")
+                                && serverCommand.length >= index+1) {
                             game.getPlayers()[new Integer(serverCommand[index + 1])].setPower(1);
 
                             index += 2;
-                        } else if (serverCommand[index].matches("Normal")) {
+                        } else if (serverCommand[index].matches("Normal")
+                                && serverCommand.length >= index+1) {
                             game.getPlayers()[new Integer(serverCommand[index + 1])].setPower(0);
 
                             index += 2;
-                        } else if (serverCommand[index].matches("Leave")) {
+                        } else if (serverCommand[index].matches("Leave")
+                                && serverCommand.length >= index+1) {
                             game.setPlayer(new Integer(serverCommand[index + 1]), null);
 
                             index += 2;
-                        } else if (serverCommand[index].matches("Eaten")) {
+                        } else if (serverCommand[index].matches("Eaten")
+                                && serverCommand.length >= index+1) {
                             int playerID = new Integer(serverCommand[index + 1]);
                             game.getPlayers()[playerID].setPosX(game.getSpawnX());
                             game.getPlayers()[playerID].setPosY(game.getSpawnY());
 
                             index += 2;
-                        } else if (serverCommand[index].matches("NewDot")) {
+                        } else if (serverCommand[index].matches("NewDot")
+                                && serverCommand.length >= index+1) {
                             int dotID = new Integer(serverCommand[index + 1]);
                             game.addNewDot(dotID);
                             index += 2;
-                        } else if (serverCommand[index].matches("NewGum")) {
+                        } else if (serverCommand[index].matches("NewGum")
+                                && serverCommand.length >= index+1) {
                             int gumID = new Integer(serverCommand[index + 1]);
                             game.addNewGum(gumID);
                             index += 2;
@@ -190,7 +214,7 @@ public class NetworkControler {
         } catch (IOException e) {
             this.lostPackets++;
 
-            if (lostPackets > 30*10) {
+            if (lostPackets > 30*5) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Le serveur est déconnecté");
                 System.exit(0);

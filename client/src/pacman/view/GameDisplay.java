@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.ImageObserver;
 import java.net.URL;
 
 /**
@@ -30,10 +29,9 @@ public class GameDisplay extends JPanel implements ActionListener {
         setDoubleBuffered(true);
         setBackground(Color.black);
         this.game = game;
-        pacman = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/Pacman.gif"));
+        pacman = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/Pacman.gif")).getScaledInstance(squareSize, squareSize, 0);
+        superPacman = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/Pacman.gif")).getScaledInstance(squareSize + 2*margin, squareSize + 2*margin, 0);
 
-        pacman = pacman.getScaledInstance(squareSize, squareSize, 0);
-        superPacman = pacman.getScaledInstance(squareSize + 2*margin, squareSize + 2*margin, 0 );
 
         timer = new Timer(16, this);//vitesse du jeu
         timer.start();
@@ -164,6 +162,8 @@ public class GameDisplay extends JPanel implements ActionListener {
                 g2d.fillOval((dot.x * squareSize) + (squareSize - dotSize) / 2, (dot.y * squareSize) + (squareSize - dotSize) / 2, dotSize, dotSize);
             }
         }
+
+        // Score display
     }
 
     private void drawPlayers(Graphics2D g2d) {
@@ -188,6 +188,8 @@ public class GameDisplay extends JPanel implements ActionListener {
         Graphics2D g2d = (Graphics2D) g;
         drawMap(g2d);
         drawPlayers(g2d);
+        g2d.setColor(Color.white);
+        g2d.drawString("Score: " + game.getLocalPlayer().getScore(), 2, 14);
     }
 
     public void actionPerformed(ActionEvent e) {

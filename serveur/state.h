@@ -25,6 +25,8 @@ typedef struct playerState_struct {
 	//positions in units
 	int posX;
 	int posY;
+	int score;
+	int streak;
 }* PlayerState;
 
 // Dot
@@ -41,6 +43,8 @@ typedef struct gum_struct {
 
 // State
 typedef struct state_struct {
+	Dot originalDot;
+	Gum originalGum;
 	int id;
         PlayerState players[PLAYERSMAX];
         Dot dots[DOTSNUMBER];
