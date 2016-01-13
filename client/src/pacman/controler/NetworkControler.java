@@ -53,7 +53,9 @@ public class NetworkControler {
         try {
             serverAnswer = receiveCommand();
         } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Impossible de se connecter au serveur :-(");
             e.printStackTrace();
+            System.exit(0);
         }
         String[] commandContent = serverAnswer.split("[ |\u0000|\n]+");
 
@@ -64,6 +66,7 @@ public class NetworkControler {
         } else {
             JOptionPane.showMessageDialog(null, "Le serveur n'a plus de place");
             connected = false;
+            System.exit(0);
 
         }
 
